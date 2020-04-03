@@ -105,6 +105,7 @@ class ProductController extends Controller
                 <thead>
                 <tr>
                 <th class="text-center" style="font-size:12px;" >Product ID</th>
+                <th class="text-center" style="font-size:12px;" >Barcode</th>
                 <th class="text-center" style="font-size:12px;" >Product Name</th>
                 <th class="text-center" style="font-size:12px;" >Quantity IN Stock</th>
                 <th class="text-center" style="font-size:12px;" >Price</th>
@@ -130,6 +131,7 @@ class ProductController extends Controller
                         $html .='<tr>
                         <td style="font-size:12px;" class="text-center">'.$voi->id.'</td>
                         <td style="font-size:12px;" class="text-center">'.$voi->name.'</td>
+                        <td style="font-size:12px;" class="text-center">'.$voi->barcode.'</td>
                         <td style="font-size:12px;" class="text-center">'.$voi->quantity.'</td>
                         <td style="font-size:12px;" class="text-center">'.$voi->price.'</td>
                         <td style="font-size:12px;" class="text-right">'.$voi->cost.'</td>
@@ -147,6 +149,7 @@ class ProductController extends Controller
                     endforeach;
 
                     $html .='<tr>
+                        <td style="font-size:12px;" class="text-center"></td>
                         <td style="font-size:12px;" class="text-center"></td>
                         <td style="font-size:12px;" class="text-center">Total</td>
                         <td style="font-size:12px;" class="text-center">'.$total_quantity.'</td>
@@ -416,13 +419,26 @@ class ProductController extends Controller
         // dd($request);
         //excel 
         $data=array();
-        $array_column=array('Product ID','Product Name','Quantity IN Stock','Price','Cost','Total Price','Total Cost','Product Date');
+        $array_column=array('Product ID', 'Barcode', 'Product Name','Quantity IN Stock','Price','Cost','Total Price','Total Cost','Product Date');
         array_push($data, $array_column);
         $inv=$this->ExportReport($request);
+        $total_stock=0;
+        $total_price=0;
+        $total_cost=0;
+        $total_amount_price=0;
+        $total_amount_cost=0;
         foreach($inv as $voi):
-            $inv_arry=array($voi->id,$voi->name,$voi->quantity,$voi->price,$voi->cost,$voi->price*$voi->quantity,$voi->cost*$voi->quantity,$voi->created_at);
+            $inv_arry=array($voi->id, $voi->barcode, $voi->name, $voi->quantity,$voi->price,$voi->cost,$voi->price*$voi->quantity,$voi->cost*$voi->quantity,$voi->created_at);
             array_push($data, $inv_arry);
+            $total_stock += $voi->quantity;
+            $total_price += $voi->price;
+            $total_cost += $voi->cost;
+            $total_amount_price += $voi->price* $voi->quantity;
+            $total_amount_cost += $voi->cost* $voi->quantity;
         endforeach;
+
+        $inv_arry = array('','', 'Total', $total_stock, $total_price, $total_cost, $total_amount_price, $total_amount_cost,'');
+        array_push($data, $inv_arry);
 
         $reportName="Product Report";
         $report_title="Product Report";
@@ -462,6 +478,7 @@ class ProductController extends Controller
                 <thead>
                 <tr>
                 <th class="text-center" style="font-size:12px;" >Product ID</th>
+                <th class="text-center" style="font-size:12px;" >Barcode</th>
                 <th class="text-center" style="font-size:12px;" >Product Name</th>
                 <th class="text-center" style="font-size:12px;" >Quantity IN Stock</th>
                 <th class="text-center" style="font-size:12px;" >Price</th>
@@ -474,9 +491,15 @@ class ProductController extends Controller
                 <tbody>';
 
                     $inv=$this->ExportReport($request);
+        $total_stock = 0;
+        $total_price = 0;
+        $total_cost = 0;
+        $total_amount_price = 0;
+        $total_amount_cost = 0;
                     foreach($inv as $voi):
                         $html .='<tr>
                         <td style="font-size:12px;" class="text-center">'.$voi->id.'</td>
+                        <td style="font-size:12px;" class="text-center">'.$voi->barcode.'</td>
                         <td style="font-size:12px;" class="text-center">'.$voi->name.'</td>
                         <td style="font-size:12px;" class="text-center">'.$voi->quantity.'</td>
                         <td style="font-size:12px;" class="text-center">'.$voi->price.'</td>
@@ -485,8 +508,25 @@ class ProductController extends Controller
                         <td style="font-size:12px;" class="text-right">'.$voi->cost*$voi->quantity.'</td>
                         <td style="font-size:12px;" class="text-right">'.$voi->created_at.'</td>
                         </tr>';
+            $total_stock += $voi->quantity;
+            $total_price += $voi->price;
+            $total_cost += $voi->cost;
+            $total_amount_price += $voi->price * $voi->quantity;
+            $total_amount_cost += $voi->cost * $voi->quantity;
 
                     endforeach;
+
+        $html .= '<tr>
+                        <td style="font-size:12px;" class="text-center"></td>
+                        <td style="font-size:12px;" class="text-center"></td>
+                        <td style="font-size:12px;" class="text-center">Total =</td>
+                        <td style="font-size:12px;" class="text-center">' . $total_stock . '</td>
+                        <td style="font-size:12px;" class="text-center">' . $total_price . '</td>
+                        <td style="font-size:12px;" class="text-right">' . $total_cost . '</td>
+                        <td style="font-size:12px;" class="text-right">' . $total_amount_price . '</td>
+                        <td style="font-size:12px;" class="text-right">' . $total_amount_cost . '</td>
+                        <td style="font-size:12px;" class="text-right"></td>
+                        </tr>';
 
 
 

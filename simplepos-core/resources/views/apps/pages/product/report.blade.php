@@ -77,26 +77,26 @@
     </div>
 
 
-    <?php 
-    $invoice_quantity=0;
-    $cost_total=0;
-    $price_total=0;
-    ?>
-    @if(isset($dataTable))
-        @foreach($dataTable as $inv)
         <?php 
-            $invoice_quantity+=$inv->quantity;
-            $cost_total+=$inv->price*$inv->quantity;
-            $price_total+=$inv->cost*$inv->quantity;
+        $invoice_quantity=0;
+        $cost_total=0;
+        $price_total=0;
         ?>
-        @endforeach
-    @endif
+        @if(isset($dataTable))
+            @foreach($dataTable as $inv)
+            <?php 
+                $invoice_quantity+=$inv->quantity;
+                $cost_total+=$inv->price*$inv->quantity;
+                $price_total+=$inv->cost*$inv->quantity;
+            ?>
+            @endforeach
+        @endif
 
 
-<div class="col-lg-4 col-sm-12 border-right-pink bg-info bg-lighten-1 border-right-lighten-4">
+        <div class="col-lg-4 col-sm-12 border-right-pink bg-info bg-lighten-1 border-right-lighten-4">
             <div class="card-block text-xs-center">
-                <h1 class="display-4 white"><i class="icon-cart font-large-2"></i> {{$invoice_quantity}}</h1>
-                <span class="white">Total Quantity</span>
+                <h1 class="display-4 white"><i class="icon-database font-large-2"></i> {{$invoice_quantity}}</h1>
+                <span class="white">Total Stock</span>
             </div>
         </div>
         <div class="col-lg-4 col-sm-12 bg-info bg-lighten-2 border-right-pink border-right-lighten-4">
@@ -137,6 +137,7 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>Barcode</th>
                                 <th>Name</th>
                                 <th style="width: 50px;">Quantity in Stock</th>
                                 <th>Price</th>
@@ -151,6 +152,7 @@
                             @foreach($dataTable as $row)
                             <tr>
                                 <td>{{$row->id}}</td>
+                                <td>{{$row->barcode}}</td>
                                 <td>{{$row->name}}</td>
                                 <td>{{$row->quantity}}</td>
                                 <td>{{$row->price}}</td>
