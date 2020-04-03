@@ -45,6 +45,7 @@
 @endsection
 
 @section('js')
+	
 	@if(isset($invoiceSlip))
 	<script type="text/javascript">
 		function putInvoiceModal(invNo)
@@ -219,7 +220,18 @@
 	    <!-- END PAGE LEVEL JS-->
     @endif
 
-    @if(isset($confirmStockIN))
+	@if(isset($confirmStockIN))
+		<script>
+		$('select[name=vendor_id]').change(function(){
+			var ven=$(this).val();
+			if(ven=='new')
+			{
+				$('select[name=vendor_id]').hide();
+				$('input[name=new_vendor_name]').show();
+			}
+			
+		});
+	</script>
     	<script type="text/javascript">
 			$(document).ready(function(){
 				$(".typed_quantity").keyup(function(){

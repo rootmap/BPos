@@ -97,7 +97,7 @@ class StaticDataController extends Facade {
 
     public static function urlForChangeData()
     {
-        return "http://pos.bhuyianhost.com/";
+        return "http://localhost/bpos/pos/";
     }
 
     public static function userguideInit() 
@@ -112,31 +112,44 @@ class StaticDataController extends Facade {
                         ->where('page_name',$fullURL)
                         ->where('user_tour_status',2)
                         ->count();
-        $stReturn=0; 
-        if($sttopTour==1)
-        {
-            $stReturn=0;
-        }
-        else
-        {
-            if($chkeck==0)
-            {
-                $stReturn=1;
-            }
-            else
-            {
-                $chkeckSND=UserTour::where('user_id',self::UserID())
-                            ->where('page_name',$fullURL)
-                            ->where('user_tour_status',1)
-                            ->count();
-                if($chkeckSND==1)
-                {
-                    $stReturn=1;
-                }
 
-                
+        $matchRouteLink=0;
+        $skipArray=array('purchase');
+        if(count($skipArray)>0)
+        {
+            foreach($skipArray as $row)
+            {
+                if(strcmp($fullURL, $row) == 0)
+                {
+                    $matchRouteLink = 1;
+                }
             }
         }
+
+        if($matchRouteLink==0)
+        {
+            $stReturn = 0;
+            if ($sttopTour == 1) {
+                $stReturn = 0;
+            } else {
+                if ($chkeck == 0) {
+                    $stReturn = 1;
+                } else {
+                    $chkeckSND = UserTour::where('user_id', self::UserID())
+                        ->where('page_name', $fullURL)
+                        ->where('user_tour_status', 1)
+                        ->count();
+                    if ($chkeckSND == 1) {
+                        $stReturn = 1;
+                    }
+                }
+            }
+        }
+        else {
+            $stReturn = 2;
+        }
+        
+        
 
 
         return $stReturn;

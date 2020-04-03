@@ -62,7 +62,29 @@ Route::get('pdf', 'InvoiceController@GenaratePDF');
 
 Route::group(['middleware' => 'auth'], function () {
 
+	//Purchase 
+	Route::get('/purchase', 'PurchaseController@index');
+	Route::get('/purchase/item', 'PurchaseController@indexItem');
+	Route::post('/purchase/item', 'PurchaseController@indexItem');
+	Route::post('/purchase', 'PurchaseController@index');
+	Route::get('/purchase/create', 'PurchaseController@create');
+	Route::post('/purchase/save', 'PurchaseController@store');
+	Route::get('/purchase/receipt/{id}', 'PurchaseController@edit');
+	Route::get('/purchase/delete/{id}', 'PurchaseController@destroy');
+	Route::post('/purchase/modify/{id}', 'PurchaseController@update');
+	Route::post('/product/purchase/confirm', 'PurchaseController@confirm');
+	Route::post('/product/purchase/save', 'PurchaseController@purchaseSave');
 
+	Route::get('/purchase/excel/report', 'PurchaseController@ExcelReport');
+	Route::post('/purchase/excel/report', 'PurchaseController@ExcelReport');
+	Route::get('/purchase/pdf/report', 'PurchaseController@PdfReport');
+	Route::post('/purchase/pdf/report', 'PurchaseController@PdfReport');
+
+	Route::get('/purchase/item/excel/report', 'PurchaseController@ExcelItemReport');
+	Route::post('/purchase/item/excel/report', 'PurchaseController@ExcelItemReport');
+	Route::get('/purchase/item/pdf/report', 'PurchaseController@PdfItemReport');
+	Route::post('/purchase/item/pdf/report', 'PurchaseController@PdfItemReport');
+	
     Route::post('/chat/message/send', 'ChatController@store');
 	Route::post('/chat/message/load', 'ChatController@index');
 	Route::get('/admin/chat', 'ChatController@master');

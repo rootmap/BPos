@@ -123,7 +123,9 @@
                         </a>
                     </li>
                     @endif
-                    
+                    @if(in_array('purchase/create', $dataMenuAssigned))
+                    <li  class="{{ Request::path() == 'purchase/create' ? 'active' : '' }} border-bottom-purple"><a href="{{url('/purchase/create')}}" class="menu-item">Add New Purchase</a></li>
+                    @endif 
                     @if(in_array('variance/create', $dataMenuAssigned))
                     <li  class="{{ Request::path() == 'variance/create' ? 'active' : '' }} border-bottom-purple"><a href="{{url('/variance/create')}}" class="menu-item">Add New Variance</a></li>
                     @endif 
@@ -221,6 +223,9 @@
 
                     @if(in_array('expense/voucher/report', $dataMenuAssigned))
                     <li class="{{ Request::path() == 'expense/voucher/report' ? 'active' : '' }} border-bottom-purple"><a href="{{url('/expense/voucher/report')}}" class="menu-item">Expense Voucher Report</a></li>
+                    @endif 
+                    @if(in_array('purchase/item', $dataMenuAssigned))
+                    <li class="{{ Request::path() == 'purchase/item' ? 'active' : '' }} border-bottom-purple"><a href="{{url('/purchase/item')}}" class="menu-item">Purchase Item Report</a></li>
                     @endif 
                     @if(in_array('profit/report', $dataMenuAssigned))
                     <li class="{{ Request::path() == 'profit/report' ? 'active' : '' }} border-bottom-purple"><a href="{{url('/profit/report')}}" class="menu-item">Profit Report</a></li>
