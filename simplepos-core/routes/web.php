@@ -477,7 +477,7 @@ Route::group(['middleware' => 'auth'], function () {
 	
 	Route::get('pos/settings', 'PosSettingController@index');
 	Route::get('pos/settings/invoice/{id}', 'PosSettingController@invoiceLayout');
-	Route::post('pos/settings/invoice/save/{id}', 'PosSettingController@invoiceLayoutSave');
+	Route::post('pos-settings/invoice/save/{id}', 'PosSettingController@invoiceLayoutSave');
 	Route::post('pos/settings/save', 'PosSettingController@store');
 	Route::post('pos/settings/update/{id}', 'PosSettingController@update');
 

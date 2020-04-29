@@ -1909,7 +1909,18 @@ class InvoiceController extends Controller
             $last_invoice_id=0;
         }
 
-        $ps=PosSetting::find(1);
+        $psCount=PosSetting::where('store_id', $this->sdc->storeID())->count();
+        if($psCount>0)
+        {
+            $ps = PosSetting::where('store_id', $this->sdc->storeID())->first();
+        }
+        else {
+            $ps = PosSetting::find(1);
+        }
+
+        //dd($ps);
+
+        
         $pro=Product::where('store_id',$this->sdc->storeID())->where('general_sale',0)->get();
         //dd($pro);
         /*->when($filter, function($query) use ($filter){
@@ -4916,8 +4927,15 @@ class InvoiceController extends Controller
                      ->where('invoices.store_id',$this->sdc->storeID())
                      ->where('invoices.id',$sales_id)
                      ->first();
-            //dd($tab);
-            return view('apps.pages.sales.make-sales-return-form',['ps'=>$tab]);
+
+            $tabSales=InvoiceProduct::join('products', 'invoice_products.product_id','=', 'products.id')
+                                    ->select('invoice_products.*', 'products.barcode as product_barcode', 'products.name as product_name')
+                                    ->where('invoice_products.invoice_id',$tab->invoice_id)
+                                    ->get();
+
+
+            //dd($tabSales);
+            return view('apps.pages.sales.make-sales-return-form',['ps'=>$tab,'sales_item'=> $tabSales]);
         }
         else
         {
@@ -4932,22 +4950,42 @@ class InvoiceController extends Controller
             'return_amount'=>'required|numeric'
         ]);
 
-        $tab=$invoice::find($sales_id);
-        $tab->sales_return=1;
-        $tab->save();
+        //dd($request->return_item);
 
-        $sr=new SalesReturn;
-        $sr->invoice_id=$tab->invoice_id;
-        $sr->customer_id=$tab->customer_id;
-        $sr->customer_name=$request->customer_name;
-        $sr->invoice_total=$tab->total_amount;
-        $sr->sales_return_amount=$request->return_amount;
-        $sr->sales_return_note=$request->sales_return_note;
-        $sr->store_id=$this->sdc->storeID();
-        $sr->created_by=$this->sdc->UserID();
-        $sr->save();
+        if(count($request->return_item)>0)
+        {
 
-        return redirect('sales/return/create')->with('status','Sales Return Completed Successfully.'); 
+            foreach($request->return_item as $item){
+                $getInvoiceItem=InvoiceProduct::find($item);
+                $tab=Product::find($getInvoiceItem->product_id);
+                $tab->quantity = $tab->quantity + $getInvoiceItem->quantity;
+                $tab->save();
+            }
+
+            $tab = $invoice::find($sales_id);
+            $tab->sales_return = 1;
+            $tab->save();
+
+
+
+            $sr = new SalesReturn;
+            $sr->invoice_id = $tab->invoice_id;
+            $sr->customer_id = $tab->customer_id;
+            $sr->customer_name = $request->customer_name;
+            $sr->invoice_total = $tab->total_amount;
+            $sr->sales_return_amount = $request->return_amount;
+            $sr->sales_return_note = $request->sales_return_note;
+            $sr->store_id = $this->sdc->storeID();
+            $sr->created_by = $this->sdc->UserID();
+            $sr->save();
+
+            return redirect('sales/return/create')->with('status', 'Sales Return Completed Successfully.'); 
+        }
+        else {
+            return redirect($_SERVER['HTTP_REFERER'])->with('error', 'No Item Seleted for Return.'); 
+        }
+
+        
     }
 
     /**

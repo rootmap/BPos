@@ -122,6 +122,44 @@
         </div>
     </div>
 </div>   
+
+
+	<?php 
+	$invoice_total=0;
+	$cost_total=0;
+	$profit_total=0;
+	?>
+	@if(isset($dataTable))
+		@foreach($dataTable as $inv)
+		<?php 
+			$invoice_total+=$inv->total_amount;
+			$cost_total+=$inv->total_cost;
+			$profit_total+=$inv->total_amount-$inv->total_cost;
+		?>
+        @endforeach
+	@endif
+
+
+<div class="col-lg-4 col-sm-12 border-right-pink bg-info bg-lighten-1 border-right-lighten-4">
+            <div class="card-block text-xs-center">
+                <h1 class="display-4 white"><i class="icon-cart font-large-2"></i> <b>Tk</b> {{$invoice_total}}</h1>
+                <span class="white">Total Invoice</span>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-12 bg-info bg-lighten-2 border-right-pink border-right-lighten-4">
+            <div class="card-block text-xs-center">
+                <h1 class="display-4 white"><i class="icon-trending_up font-large-2"></i> <b>Tk</b> {{$cost_total}}</h1>
+                <span class="white">Total Cost</span>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 bg-info bg-lighten-3 col-sm-12">
+            <div class="card-block text-xs-center">
+                <h1 class="display-4 white"><i class="icon-banknote font-large-2"></i> <b>Tk</b> {{$profit_total}}</h1>
+                <span class="white">Profit</span>
+            </div>
+        </div>
+
     <!-- Both borders end-->
 <div class="row">
     <div class="col-xs-12" @if($userguideInit==1) data-step="6" data-intro="You are seeing your sales report by search." @endif>
@@ -150,7 +188,9 @@
                                 <th>Sold To</th>
                                 <th>Tender</th>
                                 <th>Status</th>
-                                <th>Invoice Total Amount</th>
+                                <th>Invoice Amount</th>
+                                <th>Invoice Cost</th>
+                                <th>Invoice Profit</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -175,6 +215,8 @@
                                     @endif
                                 </td>
                                 <td>{{$row->total_amount}}</td>
+                                <td>{{$row->total_cost}}</td>
+                                <td>{{number_format($row->total_amount-$row->total_cost,2)}}</td>
                                 <td>
                                     <span class="dropdown" @if($userguideInit==1) data-step="7" data-intro="In this button You see view invoice ,send invoice, edit and delete option." @endif>
                                         <button id="btnSearchDrop4" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" class="btn btn-info dropdown-toggle dropdown-menu-right"><i class="icon-cog3"></i></button>

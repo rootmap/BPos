@@ -56,11 +56,6 @@ class PosSettingController extends Controller
 
     public function invoiceLayoutSave(Request $request,$id)
     {
-        
-        dd($request);
-
-        echo "Worked"; die();
-
         $destinationPath = './company';
         if($id==1)
         {

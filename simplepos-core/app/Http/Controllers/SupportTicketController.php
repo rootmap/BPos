@@ -85,12 +85,12 @@ class SupportTicketController extends Controller
         $menu_name = $menu->name;
         
         $filename = "";
-            if (!empty($request->file('attachment'))) {
-                $img = $request->file('attachment');
-                $upload = 'upload/SupportTicket/';
-                $filename = time() . "." . $img->getClientOriginalExtension();
-                $success = $img->move($upload, $filename);
-            }
+        if ($request->hasFile('attachment')) {
+            $img = $request->file('attachment');
+            $upload = 'upload/SupportTicket/';
+            $filename = time() . "." . $img->getClientOriginalExtension();
+            $success = $img->move($upload, $filename);
+        }
             
 
         //dd($filename);

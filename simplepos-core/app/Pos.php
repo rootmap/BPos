@@ -2,6 +2,7 @@
 
 namespace App;
 use App\PosSetting;
+use Auth;
 class Pos {
 
     public $items = null;
@@ -24,6 +25,8 @@ class Pos {
 
         if ($oldCart) {
 
+            $authUserStore = \Auth::user()->store_id;
+
             if(empty($oldCart->invoiceID))
             {
                 $this->invoiceID=time();
@@ -38,7 +41,8 @@ class Pos {
                     $tabCount=PosSetting::count();
                     if($tabCount>0)
                     {
-                        $tab=PosSetting::find(1);
+                        
+                        $tab=PosSetting::where('store_id', $authUserStore)->first();
                         $this->TaxRate=$tab->sales_tax;
                     }
                     else
@@ -56,7 +60,7 @@ class Pos {
                     $tabCount=PosSetting::count();
                     if($tabCount>0)
                     {
-                        $tab=PosSetting::find(1);
+                        $tab=PosSetting::where('store_id', $authUserStore)->first();
                         $this->discount_type=$tab->discount_type;
                     }
                     else
@@ -74,7 +78,7 @@ class Pos {
                     $tabCount=PosSetting::count();
                     if($tabCount>0)
                     {
-                        $tab=PosSetting::find(1);
+                        $tab=PosSetting::where('store_id', $authUserStore)->first();
                         $this->sales_discount=$tab->sales_discount;
                     }
                     else
@@ -177,7 +181,7 @@ class Pos {
 
     public function add($item, $id) {
 
-        $storeditem = ['qty' => 0, 'price' => $item->price,'tax' =>0, 'unitprice' => $item->price, 'item' => $item->name, 'item_id' => $id];
+        $storeditem = ['qty' => 0, 'price' => $item->price, 'stock' => $item->quantity, 'tax' =>0, 'unitprice' => $item->price, 'item' => $item->name, 'item_id' => $id];
         if ($this->items) {
             if (array_key_exists($id, $this->items)) {
                 $storeditem = $this->items[$id];
@@ -195,7 +199,7 @@ class Pos {
 
     public function addCustomPrice($item, $id,$price) {
 
-        $storeditem = ['qty' => 0, 'price' => $price,'tax' =>0, 'unitprice' => $price, 'item' => $item->name, 'item_id' => $id];
+        $storeditem = ['qty' => 0, 'price' => $price,'tax' =>0, 'stock' => $item->quantity, 'unitprice' => $price, 'item' => $item->name, 'item_id' => $id];
         if ($this->items) {
             if (array_key_exists($id, $this->items)) {
                 $storeditem = $this->items[$id];
@@ -214,7 +218,7 @@ class Pos {
 
     public function addCustomQuantity($item, $id,$quantity) {
 
-        $storeditem = ['qty' => 0, 'price' => $item->price,'tax' =>0, 'unitprice' => $item->price, 'item' => $item->name, 'item_id' => $id];
+        $storeditem = ['qty' => 0, 'price' => $item->price, 'stock' => $item->quantity, 'tax' =>0, 'unitprice' => $item->price, 'item' => $item->name, 'item_id' => $id];
         if ($this->items) {
             if (array_key_exists($id, $this->items)) {
                 $storeditem = $this->items[$id];

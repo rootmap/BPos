@@ -26,6 +26,42 @@
 							{{csrf_field()}}
 							<div class="form-body">
 	                			<div class="form-group row last">
+	                        		<div class="col-md-12">
+										<table class="table table-border">
+											<thead class="thead-inverse">
+												<tr>
+													<th>SL</th>
+													<th>Barcode</th>
+													<th>Product Name</th>
+													<th>Sold Quantity</th>
+													<th>Unit Price</th>
+													<th>Total Price</th>
+													<th>Want TO Return This ?</th>
+												</tr>
+											</thead>
+											<tbody>
+												@if(count($sales_item)>0)
+													@foreach($sales_item as $key=>$row)
+														<tr>
+															<td>{{$key+1}}</td>
+															<td>{{$row->product_barcode}}</td>
+															<td>{{$row->product_name}}</td>
+															<td>{{$row->quantity}}</td>
+															<td>{{$row->price}} Tk</td>
+															<td>{{$row->total_price}} Tk</td>
+															<td>
+															<input type="checkbox" checked="checked" name="return_item[]" value="{{$row->id}}" />
+															</td>
+														</tr>
+													@endforeach
+												@endif
+											</tbody>
+										</table>
+									</div>
+		                        </div>
+							</div>
+							<div class="form-body">
+	                			<div class="form-group row last">
 	                        		<label class="col-md-4 label-control">Customer Name</label>
 	                        		<div class="col-md-7">
 										<div class="form-group">

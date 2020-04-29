@@ -86,8 +86,8 @@
             @foreach($dataTable as $inv)
             <?php 
                 $invoice_quantity+=$inv->quantity;
-                $cost_total+=$inv->price*$inv->quantity;
-                $price_total+=$inv->cost*$inv->quantity;
+                $price_total+=$inv->price*$inv->quantity;
+                $cost_total+=$inv->cost*$inv->quantity;
             ?>
             @endforeach
         @endif

@@ -62,12 +62,12 @@
         @endforeach
         @endif   --}}
 
-        <script type="text/javascript">
+        <style type="text/css">
             .height-30
             {
                 height:30px !important;
             }
-        </script>
+        </style>
         <span id="product_place"> 
             <div class="col-md-12">
                 <h2  class="text-xs-center">Click on category to load product. <br>  <br> 
@@ -248,6 +248,7 @@
                                     <tr>
                                         <th>Product</th>
                                         <th>Qty</th>
+                                        <th>Stock</th>
                                         <th>Price</th>
                                         <th>Total</th>
                                         <th width="100">Action</th>
@@ -255,10 +256,13 @@
                                 </thead>
                                 <tbody id="dataCart">
                                     @if(isset($cart->items))
+                                    {{-- {{dd($cart)}} --}}
                                     @foreach($cart->items as $index=>$row)
+                                    
                                     <tr id="{{$row['item_id']}}">
                                         <td>{{$row['item']}}</td>
                                         <td ondblclick="liveRowCartEdit({{$row['item_id']}})">{{$row['qty']}}</td>
+                                        <td ondblclick="liveRowCartEdit({{$row['item_id']}})">{{$row['stock']}}</td>
                                         <td ondblclick="liveRowCartEdit({{$row['item_id']}})" data-tax="{{$row['tax']}}"  data-price="{{$row['unitprice']}}"><b>Tk</b> <span>{{$row['unitprice']}}</span></td>
                                         <td ondblclick="liveRowCartEdit({{$row['item_id']}})"><b>Tk</b> <span>{{$row['price']}}</span></td>
                                         <td style="width: 83px;">
@@ -274,10 +278,12 @@
                                         <th>Sub-Total</th>
                                         <td></td>
                                         <td></td>
+                                        <td></td>
                                         <td colspan="2"><b>Tk</b> <span>0.00</span></td>
                                     </tr>
                                     <tr>
                                         <th>Sales Tax <code style="background: none;">(+)</code></th>
+                                        <td></td>
                                         <td></td>
                                         <td></td>
                                         <td colspan="2"><b>Tk</b> <span>0.00</span></td>
@@ -286,16 +292,19 @@
                                         <th>Discount : <span>0%</span> <code style="color:green; background: none;">(-)</code></th>
                                         <td></td>
                                         <td></td>
+                                        <td></td>
                                         <td colspan="2"><b>Tk</b> <span>0.00</span></td>
                                     </tr>
                                     <tr>
                                         <th>Total</th>
                                         <td></td>
                                         <td></td>
+                                        <td></td>
                                         <td colspan="2"><b>Tk</b> <span>0.00</span></td>
                                     </tr>
                                     <tr>
                                         <th>Paid</th>
+                                        <td></td>
                                         <td></td>
                                         <td></td>
                                         <td colspan="2"><b>Tk</b> <span>
@@ -310,10 +319,11 @@
                                         <th>Due</th>
                                         <td></td>
                                         <td></td>
+                                        <td></td>
                                         <td colspan="2"><b>Tk</b> <span>0.00</span></td>
                                     </tr>
                                     <tr>
-                                        <th colspan="2">
+                                        <th colspan="3">
                                             <button type="button" class="btn btn-block btn-info btn-lighten-2">
                                                     <h4>
                                                         <span>Total Due</span> 
@@ -328,7 +338,7 @@
                                         </th>
                                     </tr>   
                                     <tr>
-                                        <th colspan="5">
+                                        <th colspan="6">
                                             <label>
                                                 <input type="checkbox" name="counterPay" id="counterPay" 
                                                 @if(isset($cart->AllowCustomerPayBill)) 
@@ -538,6 +548,20 @@
 <script>
 //editRowLive
     //
+    
+    function updateLiveCartQuantity(rowID){
+        var quantity=$("#"+rowID).children("td:eq(1)").children('input').val();
+        if(quantity.length>0)
+        {
+            var price=$("#"+rowID).children("td:eq(3)").find("span").children('input').val();
+            if(price.length>0)
+            {
+                var newPrice = price * quantity;
+                $("#"+rowID).children("td:eq(4)").find("span").html(newPrice);
+            }
+        }
+    }
+
     function liveRowCartEdit(rowID)
     {
         var rowData=$("#"+rowID).children("td:eq(1)").html();
@@ -548,14 +572,14 @@
         }
         else
         {
-            var rowDataPrice=$("#"+rowID).children("td:eq(2)").find("span").html();
+            var rowDataPrice=$("#"+rowID).children("td:eq(3)").find("span").html();
             var inputDataQuantity='<input type="text" style="width:50px;" value="'+rowData+'" onkeyup="updateLiveCartQuantity('+rowID+')"  onchange="updateLiveCartQuantity('+rowID+')" />';
             var inputDataPrice='<input type="text"  style="width:50px;"  value="'+rowDataPrice+'" onkeyup="updateLiveCartQuantity('+rowID+')"  onchange="updateLiveCartQuantity('+rowID+')" />';
             $("#"+rowID).children("td:eq(1)").html(inputDataQuantity);
-            $("#"+rowID).children("td:eq(2)").find("span").html(inputDataPrice);
-            $("#"+rowID).children("td:eq(4)").children("a:eq(0)").show();
+            $("#"+rowID).children("td:eq(3)").find("span").html(inputDataPrice);
+            $("#"+rowID).children("td:eq(5)").children("a:eq(0)").show();
 
-
+            $("#"+rowID).children("td:eq(1)").children('input').focus();
         }
         
     }
@@ -798,7 +822,7 @@
                 $("#model").val(row.model_name);
                 $("#pro_id").val(row.id);
                 productFound=1;
-                add_pos_cart(row.id,row.price,row.name+' - '+row.barcode);
+                add_pos_cart(row.id,row.price,row.quantity,row.name+' - '+row.barcode);
             }
         });
 
@@ -826,7 +850,7 @@
                 {
                     var productName="'"+row.name+" - "+row.barcode+"'";
                     proHtml+='<div class="col-md-3">';
-                        proHtml+='<a href="javascript:add_pos_cart('+row.id+','+row.price+','+productName+');" class="card mb-1" style="border-bottom-right-radius:3px; border-bottom-left-radius: 3px;">';
+                        proHtml+='<a href="javascript:add_pos_cart('+row.id+','+row.price+','+row.quantity+','+productName+');" class="card mb-1" style="border-bottom-right-radius:3px; border-bottom-left-radius: 3px;">';
                             proHtml+='<div class="card-body collapse in">';
                                         
                                 proHtml+='<div class="p-1 bg-info" style="padding: 0.7rem !important; border-top-right-radius:3px; border-top-left-radius: 3px;">';
@@ -849,7 +873,7 @@
         }
     }
 
-    function add_pos_cart(ProductID,ProductPrice,ProductName)
+    function add_pos_cart(ProductID,ProductPrice,ProductQuantity,ProductName)
     {
             //alert(ProductName);
             $("#cartMessageProShow").html(loadingOrProcessing("Processing, Please Wait....!!!!"));
@@ -874,20 +898,21 @@
                 if($("#dataCart tr[id="+ProductID+"]").length)
                 {
 
-                    if($("#dataCart tr[id="+ProductID+"]").find("td:eq(2)").children("span").children("input").length)
+                    if($("#dataCart tr[id="+ProductID+"]").find("td:eq(3)").children("span").children("input").length)
                     {
                          $("#cartMessageProShow").html(warningMessage("Failed, Product in edit mode.")); 
                          return false;
                     }
-                    ProductPrice=parseFloat($("#dataCart tr[id="+ProductID+"]").find("td:eq(2)").children("span").html()).toFixed(2);
+                    ProductPrice=parseFloat($("#dataCart tr[id="+ProductID+"]").find("td:eq(3)").children("span").html()).toFixed(2);
                     //console.log($("#dataCart tr[id="+ProductID+"]").html());
                     var ExQuantity=$("#dataCart tr[id="+ProductID+"]").find("td:eq(1)").html();
                     var NewQuantity=(ExQuantity-0)+(1-0);
                     var NewPrice=(ProductPrice*NewQuantity).toFixed(2);
                     var taxAmount=parseFloat((NewPrice*taxRate)/100).toFixed(2);
                     $("#dataCart tr[id="+ProductID+"]").find("td:eq(1)").html(NewQuantity);
-                    $("#dataCart tr[id="+ProductID+"]").find("td:eq(3)").children("span").html(NewPrice);
-                    $("#dataCart tr[id="+ProductID+"]").find("td:eq(2)").attr("data-tax",taxAmount);
+                    $("#dataCart tr[id="+ProductID+"]").find("td:eq(2)").html(ProductQuantity);
+                    $("#dataCart tr[id="+ProductID+"]").find("td:eq(4)").children("span").html(NewPrice);
+                    $("#dataCart tr[id="+ProductID+"]").find("td:eq(3)").attr("data-tax",taxAmount);
 
                     console.log(NewQuantity);
                     console.log(NewPrice);
@@ -896,7 +921,7 @@
                 else
                 {
                     var taxAmount=parseFloat(((ProductPrice*1)*taxRate)/100).toFixed(2);
-                    var strHTML='<tr id="'+ProductID+'"><td>'+ProductName+'</td><td  ondblclick="liveRowCartEdit('+ProductID+')">1</td><td  ondblclick="liveRowCartEdit('+ProductID+')" data-tax="'+taxAmount+'"  data-price="'+ProductPrice+'"><b>Tk</b><span>'+ProductPrice+'</span></td><td ondblclick="liveRowCartEdit('+ProductID+')"><b>Tk</b><span>'+ProductPrice+'</span></td><td style="width: 81px;"><a  href="javascript:editRowLive('+ProductID+');"  title="Edit" class="btn btn-sm btn-outline-info hiddenLiveSave" style="margin-right:2px;  display: none;"><i class="icon-pencil22"></i></a><a href="javascript:delposSinleRow('+ProductID+');" title="Delete" class="btn btn-sm btn-outline-danger"><i class="icon-cross"></i></a></td></tr>';
+                    var strHTML='<tr id="'+ProductID+'"><td>'+ProductName+'</td><td  ondblclick="liveRowCartEdit('+ProductID+')">1</td><td  ondblclick="liveRowCartEdit('+ProductID+')">'+ProductQuantity+'</td><td  ondblclick="liveRowCartEdit('+ProductID+')" data-tax="'+taxAmount+'"  data-price="'+ProductPrice+'"><b>Tk</b><span>'+ProductPrice+'</span></td><td ondblclick="liveRowCartEdit('+ProductID+')"><b>Tk</b><span>'+ProductPrice+'</span></td><td style="width: 81px;"><a  href="javascript:editRowLive('+ProductID+');"  title="Edit" class="btn btn-sm btn-outline-info hiddenLiveSave" style="margin-right:2px;  display: none;"><i class="icon-pencil22"></i></a><a href="javascript:delposSinleRow('+ProductID+');" title="Delete" class="btn btn-sm btn-outline-danger"><i class="icon-cross"></i></a></td></tr>';
 
                     $("#dataCart").append(strHTML);
                 }
@@ -904,7 +929,7 @@
             else
             {
                 var taxAmount=parseFloat(((ProductPrice*1)*taxRate)/100).toFixed(2);
-                var strHTML='<tr id="'+ProductID+'"><td>'+ProductName+'</td><td ondblclick="liveRowCartEdit('+ProductID+')">1</td><td  ondblclick="liveRowCartEdit('+ProductID+')" data-tax="'+taxAmount+'"  data-price="'+ProductPrice+'"><b>Tk</b><span>'+ProductPrice+'</span></td><td ondblclick="liveRowCartEdit('+ProductID+')"><b>Tk</b><span>'+ProductPrice+'</span></td><td style="width: 81px;"><a  href="javascript:editRowLive('+ProductID+');" title="Edit" class="btn btn-sm btn-outline-info hiddenLiveSave" style="margin-right:2px;  display: none;"><i class="icon-pencil22"></i></a><a href="javascript:delposSinleRow('+ProductID+');" title="Delete" class="btn btn-sm btn-outline-danger"><i class="icon-cross"></i></a></td></tr>';
+                var strHTML='<tr id="'+ProductID+'"><td>'+ProductName+'</td><td ondblclick="liveRowCartEdit('+ProductID+')">1</td><td  ondblclick="liveRowCartEdit('+ProductID+')">'+ProductQuantity+'</td><td  ondblclick="liveRowCartEdit('+ProductID+')" data-tax="'+taxAmount+'"  data-price="'+ProductPrice+'"><b>Tk</b><span>'+ProductPrice+'</span></td><td ondblclick="liveRowCartEdit('+ProductID+')"><b>Tk</b><span>'+ProductPrice+'</span></td><td style="width: 81px;"><a  href="javascript:editRowLive('+ProductID+');" title="Edit" class="btn btn-sm btn-outline-info hiddenLiveSave" style="margin-right:2px;  display: none;"><i class="icon-pencil22"></i></a><a href="javascript:delposSinleRow('+ProductID+');" title="Delete" class="btn btn-sm btn-outline-danger"><i class="icon-cross"></i></a></td></tr>';
 
                 $("#dataCart").append(strHTML);
             }
@@ -1001,6 +1026,7 @@
     }
 
     $(document).ready(function() { 
+        $('input[name=barcode]').focus();
         /*var checkTopcol=$("body").hasClass("menu-collapsed");
         if(checkTopcol==false)
         {
@@ -1347,17 +1373,17 @@
                         {
                             var amount_to_pay=$("input[name=amount_to_pay]").val();
                             
-                            var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(2)").children("span").html();
+                            var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html();
                             if($.trim(expaid)==0)
                             {
                                 var parseNewPayment=parseFloat(amount_to_pay).toFixed(2);
-                                $("#posCartSummary tr:eq(4)").find("td:eq(2)").children("span").html(parseNewPayment);
+                                $("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html(parseNewPayment);
                             }
                             else
                             {
                                 var newpayment=(expaid-0)+(amount_to_pay-0);
                                 var parseNewPayment=parseFloat(newpayment).toFixed(2);
-                                $("#posCartSummary tr:eq(4)").find("td:eq(2)").children("span").html(parseNewPayment);
+                                $("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html(parseNewPayment);
                             }
                             genarateSalesTotalCart();
                             //------------------------Ajax POS Start-------------------------//
@@ -2160,18 +2186,23 @@ $("input[name=amount_to_pay]").keyup(function(){
 });
 });
 
+
 function editRowLive(id)
 {
+    
     @if(isset($ps))
         var taxRate="{{$ps->sales_tax}}";
     @else
         var taxRate=0;
     @endif
-
-        var unitPrice=$("#dataCart tr[id="+id+"]").children("td:eq(2)").find("span").children("input").val();
+    //alert(taxRate);
+        var unitPrice=$("#dataCart tr[id="+id+"]").children("td:eq(3)").find("span").children("input").val();
         var edit_quantity=$("#dataCart tr[id="+id+"]").children("td:eq(1)").children("input").val();
+
+
+
         //console.log($("#dataCart tr[id="+id+"]").find("td:eq(2)").children("span").html());
-        $("#dataCart tr[id="+id+"]").find("td:eq(2)").attr("data-price",unitPrice);
+        $("#dataCart tr[id="+id+"]").find("td:eq(3)").attr("data-price",unitPrice);
         if($.isNumeric(edit_quantity))
         {
             if(edit_quantity>=0)
@@ -2195,10 +2226,11 @@ function editRowLive(id)
         }
         
         var taxAmount=parseFloat((totalPrice*taxRate)/100).toFixed(2);
-        $("#dataCart tr[id="+id+"]").children("td:eq(2)").find("span").html(unitPrice);
+        $("#dataCart tr[id="+id+"]").children("td:eq(3)").find("span").html(unitPrice);
         $("#dataCart tr[id="+id+"]").find("td:eq(1)").html(edit_quantity);
-        $("#dataCart tr[id="+id+"]").find("td:eq(3)").children("span").html(totalPrice);
-        $("#dataCart tr[id="+id+"]").find("td:eq(2)").attr("data-tax",taxAmount);
+        $("#dataCart tr[id="+id+"]").find("td:eq(4)").children("span").html(totalPrice);
+        $("#dataCart tr[id="+id+"]").find("td:eq(3)").attr("data-tax",taxAmount);
+        $("#dataCart tr[id="+id+"]").find("td:eq(5)").children('a:eq(0)').hide();
         genarateSalesTotalCart();
         //need to incorporate witth ajax
 
@@ -2286,7 +2318,7 @@ function editRowLive(id)
             }
 
 
-            var expaid=$.trim($("#posCartSummary tr:eq(4)").find("td:eq(2)").children("span").html());
+            var expaid=$.trim($("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html());
             if(expaid=="0")
             {
                 var paid=0;
@@ -2297,8 +2329,8 @@ function editRowLive(id)
             }
 
             $.each($("#dataCart").find("tr"),function(index,row){
-                var rowPrice=$(row).find("td:eq(3)").children("span").html();
-                var rowTax=$(row).find("td:eq(2)").attr("data-tax");
+                var rowPrice=$(row).find("td:eq(4)").children("span").html();
+                var rowTax=$(row).find("td:eq(3)").attr("data-tax");
                 subTotalPrice+=(rowPrice-0);    
                 TotalTax+=(rowTax-0);    
             });
@@ -2342,12 +2374,12 @@ function editRowLive(id)
 
             $("#posCartSummary tr:eq(2)").find("th").children("span").html(discount+"%");
 
-            $("#posCartSummary tr:eq(0)").find("td:eq(2)").children("span").html(newsubTotalPrice);
-            $("#posCartSummary tr:eq(1)").find("td:eq(2)").children("span").html(newTotalTax);
-            $("#posCartSummary tr:eq(2)").find("td:eq(2)").children("span").html(newDiscount);
-            $("#posCartSummary tr:eq(3)").find("td:eq(2)").children("span").html(newPriceTotal);
-            $("#posCartSummary tr:eq(4)").find("td:eq(2)").children("span").html(paid);
-            $("#posCartSummary tr:eq(5)").find("td:eq(2)").children("span").html(newdues);
+            $("#posCartSummary tr:eq(0)").find("td:eq(3)").children("span").html(newsubTotalPrice);
+            $("#posCartSummary tr:eq(1)").find("td:eq(3)").children("span").html(newTotalTax);
+            $("#posCartSummary tr:eq(2)").find("td:eq(3)").children("span").html(newDiscount);
+            $("#posCartSummary tr:eq(3)").find("td:eq(3)").children("span").html(newPriceTotal);
+            $("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html(paid);
+            $("#posCartSummary tr:eq(5)").find("td:eq(3)").children("span").html(newdues);
 
             $("input[name=amount_to_pay]").val(newdues);
             console.log($("input[name=amount_to_pay]").val());
@@ -2356,13 +2388,13 @@ function editRowLive(id)
         }
         else
         {
-            $("#posCartSummary tr:eq(0)").find("td:eq(2)").children("span").html("0.00");
-            $("#posCartSummary tr:eq(1)").find("td:eq(2)").children("span").html("0.00");
-            $("#posCartSummary tr:eq(2)").find("td:eq(2)").children("span").html("0.00");
+            $("#posCartSummary tr:eq(0)").find("td:eq(3)").children("span").html("0.00");
+            $("#posCartSummary tr:eq(1)").find("td:eq(3)").children("span").html("0.00");
+            $("#posCartSummary tr:eq(2)").find("td:eq(3)").children("span").html("0.00");
             $("#posCartSummary tr:eq(2)").find("th").children("span").html("0%");
-            $("#posCartSummary tr:eq(3)").find("td:eq(2)").children("span").html("0.00");
-            $("#posCartSummary tr:eq(4)").find("td:eq(2)").children("span").html("0.00");
-            $("#posCartSummary tr:eq(5)").find("td:eq(2)").children("span").html("0.00");
+            $("#posCartSummary tr:eq(3)").find("td:eq(3)").children("span").html("0.00");
+            $("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html("0.00");
+            $("#posCartSummary tr:eq(5)").find("td:eq(3)").children("span").html("0.00");
             $("input[name=amount_to_pay]").val("0.00");
             $("#prmDue").html("0.00");
             $("#totalCartDueToPay").html("0.00");
@@ -2430,29 +2462,5 @@ function editRowLive(id)
     });
 </script>
 @include('apps.include.json.pospaymentpartial',compact('addPartialPayment'))
-<!-- <tfoot id="posCartSummary">
-                                    <tr>
-                                        <th>Sub-Total</th>
-                                        <td></td>
-                                        <td colspan="3">$<span>0.00</span></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Sales Tax</th>
-                                        <td></td>
-                                        <td colspan="3">$<span>0.00</span></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Total</th>
-                                        <td></td>
-                                        <td colspan="3">$<span>0.00</span></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Due</th>
-                                        <td></td>
-                                        <td colspan="3">$<span>0.00</span></td>
-                                    </tr>
-                                </tfoot> -->
-                                
-
-                                @endsection
+@endsection
 

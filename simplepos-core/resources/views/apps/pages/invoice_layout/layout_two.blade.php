@@ -36,7 +36,7 @@
 
     </style>
 
-    <form  enctype="multipart/form-data" action="{{url('pos/settings/invoice/save/'.$id)}}" method="POST">
+    <form  enctype="multipart/form-data" action="{{url('pos-settings/invoice/save/'.$id)}}" method="POST">
         {{csrf_field()}}
         <input type="hidden" name="id" value="{{$id}}">
 	<div class="content-body"><section class="card">
