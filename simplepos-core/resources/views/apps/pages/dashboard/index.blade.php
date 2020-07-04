@@ -149,7 +149,7 @@
                 <div class="card-block">
                     <div class="media">
                         <div class="media-body text-xs-left">
-                            <h3 class="info accent-2"><b>Tk</b> {{$dbDash[0]->total_sales}}</h3>
+                            <h3 class="info accent-2"><b>Tk</b> {{number_format($dbDash[0]->total_sales,2)}}</h3>
                             <span>Today Total Sales</span>
                         </div>
                         <div class="media-right media-middle">
@@ -165,7 +165,7 @@
                 <div class="card-block">
                     <div class="media">
                         <div class="media-body text-xs-left">
-                            <h3 class="info lighten-3"><b>Tk</b> {{$dbDash[0]->total_cost}}</h3>
+                            <h3 class="info lighten-3"><b>Tk</b> {{number_format($dbDash[0]->total_cost,2)}}</h3>
                             <span>Today Total Cost</span>
                         </div>
                         <div class="media-right media-middle">
@@ -181,7 +181,7 @@
                 <div class="card-block">
                     <div class="media">
                         <div class="media-body text-xs-left">
-                            <h3 class="info"><b>Tk</b> {{$dbDash[0]->total_profit}}</h3>
+                            <h3 class="info"><b>Tk</b> {{number_format($dbDash[0]->total_profit,2)}}</h3>
                             <span>Today Total Profit</span>
                         </div>
                         <div class="media-right media-middle">

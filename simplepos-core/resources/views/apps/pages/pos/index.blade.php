@@ -445,11 +445,16 @@
                                     @endif
                                 </button>
                             </div>
-                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 button button6" @if($userguideInit==1) data-step="18" data-intro="When you click add partial payment then popup new window." @endif>
+                            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 button button6" @if($userguideInit==1) data-step="18" data-intro="When you click add partial payment then popup new window." @endif>
+                                <button type="button" class="btn btn-danger btn-darken-2 btn-responsive btn1"  data-toggle="modal" data-target="#salesReturn">     
+                                    <i class="icon-cross2"></i> Sales Return
+                                </button>
+                            </div>
+                            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 button button6" @if($userguideInit==1) data-step="18" data-intro="When you click add partial payment then popup new window." @endif>
                                 <button  id="btn-payment-modal_init" type="button" class="btn btn-info btn-darken-2 btn-responsive btn1 addPartialPayment">     
                                     <i class="icon-dollar"></i> Add Partial Payment
                                 </button>
-                        </div>
+                            </div>
                         </div>
                         <div class="clearfix"></div>
                         
@@ -472,6 +477,7 @@
 <!-- Modal for Cash Out-->
 
            @include('apps.include.modal.new-customer')
+           @include('apps.include.modal.salesReturn')
            @include('apps.include.modal.generalsaleModal')
            @include('apps.include.modal.payout')
            @include('apps.include.modal.cash-out')
@@ -510,6 +516,8 @@
 @endsection
 
 @section('css')
+<link rel="stylesheet" type="text/css" href="{{secure_url('theme/app-assets/vendors/css/extensions/pace.css')}}">
+<link rel="stylesheet" type="text/css" href="{{secure_url('theme/app-assets/vendors/css/extensions/datedropper.min.css')}}">
 <link rel="stylesheet" type="text/css" href="{{url('assets/css/pos.css')}}">
 <style type="text/css">
 .one-make-full
@@ -532,6 +540,25 @@
 @endsection
 
 @section('js')
+<script src="{{secure_url('theme/app-assets/vendors/js/extensions/pace.min.js')}}" type="text/javascript"></script>
+<script src="{{secure_url('theme/app-assets/vendors/js/extensions/datedropper.min.js')}}" type="text/javascript"></script>
+<!-- END PAGE VENDOR JS-->
+<!-- BEGIN PAGE LEVEL JS-->
+<script type="text/javascript">    
+    $(document).ready(function() {
+        $(".DropDateWithformat").dateDropper({
+            dropWidth: 200,
+            maxYear: "<?=date('Y')?>",
+            minYear: "2010",
+            format: "Y-m-d",
+            init_animation: "bounce",
+            dropPrimaryColor: "#fa4420",
+            dropBorder: "1px solid #fa4420",
+            dropBorderRadius: "20",
+            dropShadow: "0 0 10px 0 rgba(250, 68, 32, 0.6)"
+        });
+    });
+</script>
 <script src="{{url('theme/app-assets/vendors/js/forms/extended/card/jquery.card.js')}}" type="text/javascript"></script>
 <script src="{{url('theme/app-assets/js/scripts/forms/extended/form-typeahead.min.js')}}" type="text/javascript"></script>
 <script src="{{url('theme/app-assets/js/scripts/forms/extended/form-inputmask.min.js')}}" type="text/javascript"></script>
@@ -545,6 +572,14 @@
 <script src="{{url('theme/app-assets/js/scripts/forms/select/form-select2.min.js')}}" type="text/javascript"></script>
 
 <script src="{{url('theme/app-assets/js/scripts/ui/scrollable.min.js')}}" type="text/javascript"></script>
+
+<script type="text/javascript">
+    var sales_return_invoice_detail = "{{url('sales/return/invoice/detail')}}";
+    var sales_return_item = "{{url('sales/return/item')}}";
+    var sales_return_invoice_ajax="{{url('sales/return/invoice/ajax')}}";
+    var sales_return_save_ajax="{{url('sales/return/save/ajax')}}";
+</script>
+<script src="{{url('js/sales-return.js')}}" type="text/javascript"></script>
 <script>
 //editRowLive
     //
@@ -1026,6 +1061,7 @@
     }
 
     $(document).ready(function() { 
+        $.getScript("https://cdn.jsdelivr.net/npm/sweetalert2@9");
         $('input[name=barcode]').focus();
         /*var checkTopcol=$("body").hasClass("menu-collapsed");
         if(checkTopcol==false)
@@ -1268,7 +1304,7 @@
                 var parseNewPayment=0;
 
                 var amount_to_pay=$("input[name=amount_to_pay]").val();                
-                var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(1)").children("span").html();
+                var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html();
                 if($.trim(expaid)==0)
                 {
                     var parseNewPayment=parseFloat(amount_to_pay).toFixed(2);
@@ -1302,7 +1338,7 @@
             var parseNewPayment=0;
 
             var amount_to_pay=$("input[name=amount_to_pay]").val();                
-            var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(2)").children("span").html();
+            var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html();
             if($.trim(expaid)==0)
             {
                 var parseNewPayment=parseFloat(amount_to_pay).toFixed(2);
@@ -1450,7 +1486,7 @@
                 var parseNewPayment=0;
 
                 var amount_to_pay=$("input[name=amount_to_pay]").val();                
-                var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(1)").children("span").html();
+                var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html();
                 if($.trim(expaid)==0)
                 {
                     var parseNewPayment=parseFloat(amount_to_pay).toFixed(2);
@@ -1484,7 +1520,7 @@
             var parseNewPayment=0;
 
             var amount_to_pay=$("input[name=amount_to_pay]").val();                
-            var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(2)").children("span").html();
+            var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html();
             if($.trim(expaid)==0)
             {
                 var parseNewPayment=parseFloat(amount_to_pay).toFixed(2);
@@ -1555,7 +1591,7 @@
                         {
                             var amount_to_pay=$("input[name=amount_to_pay]").val();
                             
-                            var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(2)").children("span").html();
+                            var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html();
                             if($.trim(expaid)==0)
                             {
                                 var parseNewPayment=parseFloat(amount_to_pay).toFixed(2);
@@ -1603,7 +1639,7 @@
             
             var parseNewPayment=0;
             var amount_to_pay=$("input[name=amount_to_pay]").val();                
-            var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(1)").children("span").html();
+            var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html();
             if($.trim(expaid)==0)
             {
                 var parseNewPayment=parseFloat(amount_to_pay).toFixed(2);
@@ -1644,7 +1680,7 @@
             }
 
             var expaid;
-            expaid=$.trim($("#posCartSummary tr:eq(4)").find("td:eq(2)").children("span").html());
+            expaid=$.trim($("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html());
             if(expaid=="0")
             {
                 var paid=0;
@@ -1716,7 +1752,8 @@
             }
 
             var expaid;
-            expaid=$.trim($("#posCartSummary tr:eq(4)").find("td:eq(2)").children("span").html());
+            expaid=$.trim($("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html());
+
             if(expaid=="0")
             {
                 var paid=0;
@@ -1734,7 +1771,7 @@
                     return false;
                 }
             }
-
+            Swal.showLoading ();
              //------------------------Ajax Customer Start-------------------------//
              var AddHowMowKhaoUrl="{{url('sales/cart/complete-sales')}}";
              $.ajax({
@@ -1746,8 +1783,11 @@
                 'data': {'_token':"{{csrf_token()}}"},
                 'success': function (data) {
                     console.log("Completing Sales : "+data)
+                    Swal.hideLoading();
+                    Swal.disableLoading();
                     if(data==1)
                     {
+
                         window.location.href=window.location.href;
                     }
                     else
@@ -1885,23 +1925,26 @@
             {
                 var amount_to_pay=$("input[name=amount_to_pay]").val();
                 console.log(amount_to_pay,payment_id,$.trim(payment_text));
-                var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(2)").children("span").html();
+                var expaid=$("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html();
                 if($.trim(expaid)==0)
                 {
                     var parseNewPayment=parseFloat(amount_to_pay).toFixed(2);
-                    $("#posCartSummary tr:eq(4)").find("td:eq(2)").children("span").html(parseNewPayment);
+                    $("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html(parseNewPayment);
                 }
                 else
                 {
                     var newpayment=(expaid-0)+(amount_to_pay-0);
                     var parseNewPayment=parseFloat(newpayment).toFixed(2);
-                    $("#posCartSummary tr:eq(4)").find("td:eq(2)").children("span").html(parseNewPayment);
+                    $("#posCartSummary tr:eq(4)").find("td:eq(3)").children("span").html(parseNewPayment);
                 }
                 genarateSalesTotalCart();
                 $("#payModal").modal("hide");
                 //------------------------Ajax POS Start-------------------------//
                 var AddPOSUrl="{{url('sales/cart/payment')}}";
+                Swal.showLoading ();
                 $.post(AddPOSUrl,{'paymentID':payment_id,'paidAmount':parseNewPayment,'_token':"{{csrf_token()}}"},function(response){
+                    Swal.hideLoading();
+                    Swal.disableLoading();
                     console.log(response);
                 });
                 //------------------------Ajax POS End---------------------------//

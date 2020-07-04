@@ -60,6 +60,7 @@
 										 type="text" id="eventRegInput1" class="form-control border-primary" placeholder="Invoice ID" name="order_no">
 	                                    </div>
 	                                </div>
+	                                
 	                                <div class="col-md-3">
 	                                    <h4>Vendor</h4>
 	                                    <div class="input-group">

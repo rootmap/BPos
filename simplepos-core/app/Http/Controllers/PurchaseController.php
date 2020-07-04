@@ -100,6 +100,11 @@ class PurchaseController extends Controller
             $vendor_id = $request->vendor_id;
         }
 
+        $barcode = '';
+        if (isset($request->barcode)) {
+            $barcode = $request->barcode;
+        }
+
         $start_date = '';
         if (isset($request->start_date)) {
             $start_date = $request->start_date;
@@ -127,48 +132,64 @@ class PurchaseController extends Controller
         //$pro = Purchase::where('store_id', $this->sdc->storeID())->get();
 
 
-        $proItem = Purchase::when($order_no, function ($query) use ($order_no) {
-                return $query->where('order_no', '=', $order_no);
-            })
-                ->when($vendor_id, function ($query) use ($vendor_id) {
-                    return $query->where('vendor_id', '=', $vendor_id);
+        $proItem = PurchaseItem::leftJoin('products', 'products.id', '=', 'purchase_items.product_id')
+                ->leftJoin('purchases', 'purchases.order_tracking_id','=', 'purchase_items.order_tracking_id')
+                ->select(
+                    'purchase_items.*', 
+                    'products.name as product_name', 
+                    'products.barcode as product_barcode',
+                    'purchases.order_date',
+                    'purchases.order_no',
+                    'purchases.vendor_name'
+                )
+                ->when($order_no, function ($query) use ($order_no) {
+                    return $query->where('purchases.order_no', '=', $order_no);
                 })
+                ->when($vendor_id, function ($query) use ($vendor_id) {
+                    return $query->where('purchases.vendor_id', '=', $vendor_id);
+                })
+                
                 ->when($dateString, function ($query) use ($dateString) {
                     return $query->whereRaw($dateString);
                 })
-                ->where('store_id', $this->sdc->storeID())
-                ->orderBy('id', 'DESC')
+                ->when($barcode, function ($query) use ($barcode) {
+                    return $query->where('products.barcode', '=', $barcode);
+                })
+                ->where('purchase_items.store_id', $this->sdc->storeID())
+                ->orderBy('purchase_items.id', 'DESC')
                 ->get();
 
-        $pro = [];
-        if(count($proItem)>0){
-            foreach($proItem as $itm){
-                $order_tracking_id=$itm->order_tracking_id;
-                $prItem=PurchaseItem::leftJoin('products', 'products.id', '=', 'purchase_items.product_id')
-                                    ->leftJoin('purchases', 'purchases.order_tracking_id','=', 'purchase_items.order_tracking_id')
-                                    ->select(
-                                        'purchase_items.*', 
-                                        'products.name as product_name', 
-                                        'products.barcode as product_barcode',
-                                        'purchases.order_date',
-                                        'purchases.order_no',
-                                        'purchases.vendor_name'
-                                    )
-                                    ->where('purchase_items.store_id', $this->sdc->storeID())
-                                    ->where('purchase_items.order_tracking_id', $order_tracking_id)
-                                    ->first();
-                $pro[]= $prItem;
-            }
-        }
+        // $pro = [];
+        // if(count($proItem)>0){
+        //     foreach($proItem as $itm){
+        //         $order_tracking_id=$itm->order_tracking_id;
+        //         $prItem=PurchaseItem::leftJoin('products', 'products.id', '=', 'purchase_items.product_id')
+        //                             ->leftJoin('purchases', 'purchases.order_tracking_id','=', 'purchase_items.order_tracking_id')
+        //                             ->select(
+        //                                 'purchase_items.*', 
+        //                                 'products.name as product_name', 
+        //                                 'products.barcode as product_barcode',
+        //                                 'purchases.order_date',
+        //                                 'purchases.order_no',
+        //                                 'purchases.vendor_name'
+        //                             )
+                                    
+        //                             ->where('purchase_items.store_id', $this->sdc->storeID())
+        //                             ->where('purchase_items.order_tracking_id', $order_tracking_id)
+        //                             ->first();
+        //         $pro[]= $prItem;
+        //     }
+        // }
 
         //dd($pro);
 
         return view('apps.pages.purchase.item-list', 
             [
-            'dataTable' => $pro,
+            'dataTable' => $proItem,
             'vendor'=> $vendor,
             'order_no' => $order_no,
             'vendor_id' => $vendor_id,
+            'barcode' => $barcode,
             'start_date' => $start_date,
             'end_date' => $end_date]);
     }
@@ -183,6 +204,11 @@ class PurchaseController extends Controller
         $vendor_id = '';
         if (isset($request->vendor_id)) {
             $vendor_id = $request->vendor_id;
+        }
+
+        $barcode = '';
+        if (isset($request->barcode)) {
+            $barcode = $request->barcode;
         }
 
         $start_date = '';
@@ -208,42 +234,34 @@ class PurchaseController extends Controller
             $dateString = "CAST(lsp_purchases.order_date as date) BETWEEN '" . $start_date . "' AND '" . $end_date . "'";
         }
         // dd($dateString);
-        $proItem = Purchase::when($order_no, function ($query) use ($order_no) {
-                    return $query->where('order_no', '=', $order_no);
-            })
-            ->when($vendor_id, function ($query) use ($vendor_id) {
-                return $query->where('vendor_id', '=', $vendor_id);
-            })
-            ->when($dateString, function ($query) use ($dateString) {
-                return $query->whereRaw($dateString);
-            })
-            ->orderBy('id', 'DESC')
-            ->get();
-        // dd($invoice);
+        $proItem = PurchaseItem::leftJoin('products', 'products.id', '=', 'purchase_items.product_id')
+                ->leftJoin('purchases', 'purchases.order_tracking_id','=', 'purchase_items.order_tracking_id')
+                ->select(
+                    'purchase_items.*', 
+                    'products.name as product_name', 
+                    'products.barcode as product_barcode',
+                    'purchases.order_date',
+                    'purchases.order_no',
+                    'purchases.vendor_name'
+                )
+                ->when($order_no, function ($query) use ($order_no) {
+                    return $query->where('purchases.order_no', '=', $order_no);
+                })
+                ->when($vendor_id, function ($query) use ($vendor_id) {
+                    return $query->where('purchases.vendor_id', '=', $vendor_id);
+                })
+                
+                ->when($dateString, function ($query) use ($dateString) {
+                    return $query->whereRaw($dateString);
+                })
+                ->when($barcode, function ($query) use ($barcode) {
+                    return $query->where('products.barcode', '=', $barcode);
+                })
+                ->where('purchase_items.store_id', $this->sdc->storeID())
+                ->orderBy('purchase_items.id', 'DESC')
+                ->get();
 
-        $pro = [];
-        if (count($proItem) > 0) {
-            foreach ($proItem as $itm) {
-                $order_tracking_id = $itm->order_tracking_id;
-                $prItem = PurchaseItem::leftJoin('products', 'products.id', '=', 'purchase_items.product_id')
-                    ->leftJoin('purchases', 'purchases.order_tracking_id', '=', 'purchase_items.order_tracking_id')
-                    ->select(
-                        'purchase_items.*',
-                        'products.name as product_name',
-                        'products.barcode as product_barcode',
-                        'purchases.order_date',
-                        'purchases.order_no',
-                        'purchases.vendor_name'
-                    )
-                    ->where('purchase_items.store_id', $this->sdc->storeID())
-                    ->where('purchase_items.order_tracking_id', $order_tracking_id)
-                    ->first();
-                $pro[] = $prItem;
-            }
-        }
-
-
-        return $pro;
+        return $proItem;
     }
 
     /**

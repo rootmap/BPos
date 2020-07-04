@@ -1918,8 +1918,6 @@ class InvoiceController extends Controller
             $ps = PosSetting::find(1);
         }
 
-        //dd($ps);
-
         
         $pro=Product::where('store_id',$this->sdc->storeID())->where('general_sale',0)->get();
         //dd($pro);
@@ -4610,6 +4608,350 @@ class InvoiceController extends Controller
      * @param  \App\Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
+    public function showitem(Invoice $invoice,request $request)
+    {
+        $invoice_id='';
+        if(isset($request->invoice_id))
+        {
+            $invoice_id=$request->invoice_id;
+        }
+        
+        $customer_id='';
+        if(isset($request->customer_id))
+        {
+            $customer_id=$request->customer_id;
+        }
+
+        $barcode='';
+        if(isset($request->barcode))
+        {
+            $barcode=$request->barcode;
+        }
+        // dd($customer_id);
+        $start_date='';
+        if(isset($request->start_date))
+        {
+            $start_date=$request->start_date;
+        }
+
+        $end_date='';
+        if(isset($request->end_date))
+        {
+            $end_date=$request->end_date;
+        }
+
+        if(empty($start_date) && !empty($end_date))
+        {
+            $start_date=$end_date;
+        }
+
+        if(!empty($start_date) && empty($end_date))
+        {
+            $end_date=$start_date;
+        }
+
+        $invoice_status='';
+        if(isset($request->invoice_status))
+        {
+            $invoice_status=$request->invoice_status;
+        }
+
+        $dateString='';
+        if(!empty($start_date) && !empty($end_date))
+        {
+            $dateString="CAST(lsp_invoice_products.created_at as date) BETWEEN '".$start_date."' AND '".$end_date."'";
+        }
+
+        if(empty($invoice_id) && empty($customer_id) && empty($start_date) && empty($end_date) && empty($dateString))
+        {
+
+            $tab = InvoiceProduct::leftJoin('products','invoice_products.product_id','=','products.id')
+                                 ->leftJoin('invoices','invoice_products.invoice_id','=','invoices.invoice_id')
+                                 ->Leftjoin('customers','invoices.customer_id','=','customers.id')
+                                 ->where('invoice_products.store_id',$this->sdc->storeID())
+                                 ->when($invoice_id, function ($query) use ($invoice_id) {
+                                        return $query->where('invoice_products.invoice_id','=', $invoice_id);
+                                 })
+                                 ->when($invoice_status, function ($query) use ($invoice_status) {
+                                        return $query->where('invoices.invoice_status','=', $invoice_status);
+                                 })
+                                 ->when($customer_id, function ($query) use ($customer_id) {
+                                        return $query->where('invoices.customer_id','=', $customer_id);
+                                 })
+                                 ->when($barcode, function ($query) use ($barcode) {
+                                        return $query->where('products.barcode','=', $barcode);
+                                 })
+                                 ->when($dateString, function ($query) use ($dateString) {
+                                        return $query->whereRaw($dateString);
+                                 })
+                                 ->select('invoice_products.*','customers.name as customer_name','products.name as product_name','products.barcode as product_barcode')
+                                 ->take(100)
+                                 ->orderBy("invoice_products.id","DESC")
+                                 ->get();
+            
+        }
+        else
+        {
+            $tab = InvoiceProduct::leftJoin('products','invoice_products.product_id','=','products.id')
+                                 ->leftJoin('invoices','invoice_products.invoice_id','=','invoices.invoice_id')
+                                 ->Leftjoin('customers','invoices.customer_id','=','customers.id')
+                                 ->where('invoice_products.store_id',$this->sdc->storeID())
+                                 ->when($invoice_id, function ($query) use ($invoice_id) {
+                                        return $query->where('invoice_products.invoice_id','=', $invoice_id);
+                                 })
+                                 ->when($invoice_status, function ($query) use ($invoice_status) {
+                                        return $query->where('invoices.invoice_status','=', $invoice_status);
+                                 })
+                                 ->when($customer_id, function ($query) use ($customer_id) {
+                                        return $query->where('invoices.customer_id','=', $customer_id);
+                                 })
+                                 ->when($barcode, function ($query) use ($barcode) {
+                                        return $query->where('products.barcode','=', $barcode);
+                                 })
+                                 ->when($dateString, function ($query) use ($dateString) {
+                                        return $query->whereRaw($dateString);
+                                 })
+                                 ->select('invoice_products.*','customers.name as customer_name','products.name as product_name','products.barcode as product_barcode')
+                                 ->take(100)
+                                 ->orderBy("invoice_products.id","DESC")
+                                 ->get();
+        }
+
+        
+        // dd($tab);      
+        $tab_customer=Customer::where('store_id',$this->sdc->storeID())->get();            
+        return view('apps.pages.sales.sales-item-list',
+            [
+                'barcode'=>$barcode,
+                'dataTable'=>$tab,
+                'customer' =>$tab_customer,
+                'invoice_id'=>$invoice_id,
+                'invoice_status'=>$invoice_status,
+                'customer_id'=>$customer_id,
+                'start_date'=>$start_date,
+                'end_date'=>$end_date
+            ]);
+    }    
+
+    public function SalesItemReport(Request $request)
+    {
+
+        $invoice_id='';
+        if(isset($request->invoice_id))
+        {
+            $invoice_id=$request->invoice_id;
+        }
+        
+        $customer_id='';
+        if(isset($request->customer_id))
+        {
+            $customer_id=$request->customer_id;
+        }
+
+        $barcode='';
+        if(isset($request->barcode))
+        {
+            $barcode=$request->barcode;
+        }
+        // dd($customer_id);
+        $start_date='';
+        if(isset($request->start_date))
+        {
+            $start_date=$request->start_date;
+        }
+
+        $end_date='';
+        if(isset($request->end_date))
+        {
+            $end_date=$request->end_date;
+        }
+
+        if(empty($start_date) && !empty($end_date))
+        {
+            $start_date=$end_date;
+        }
+
+        if(!empty($start_date) && empty($end_date))
+        {
+            $end_date=$start_date;
+        }
+
+        $invoice_status='';
+        if(isset($request->invoice_status))
+        {
+            $invoice_status=$request->invoice_status;
+        }
+        // dd($invoice_status);
+        $dateString='';
+        if(!empty($start_date) && !empty($end_date))
+        {
+            $dateString="CAST(lsp_invoices.created_at as date) BETWEEN '".$start_date."' AND '".$end_date."'";
+        }
+
+        $tab = InvoiceProduct::leftJoin('products','invoice_products.product_id','=','products.id')
+                                 ->leftJoin('invoices','invoice_products.invoice_id','=','invoices.invoice_id')
+                                 ->Leftjoin('customers','invoices.customer_id','=','customers.id')
+                                 ->where('invoice_products.store_id',$this->sdc->storeID())
+                                 ->when($invoice_id, function ($query) use ($invoice_id) {
+                                        return $query->where('invoice_products.invoice_id','=', $invoice_id);
+                                 })
+ 
+                                 ->when($customer_id, function ($query) use ($customer_id) {
+                                        return $query->where('invoices.customer_id','=', $customer_id);
+                                 })
+                                 ->when($barcode, function ($query) use ($barcode) {
+                                        return $query->where('products.barcode','=', $barcode);
+                                 })
+                                 ->when($dateString, function ($query) use ($dateString) {
+                                        return $query->whereRaw($dateString);
+                                 })
+                                 ->select('invoice_products.*','customers.name as customer_name','products.name as product_name','products.barcode as product_barcode')
+                                 ->orderBy("invoice_products.id","DESC")
+                                 ->get();
+            
+
+      // dd($tab);
+        return $tab;
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\ProductStockin  $productStockin
+     * @return \Illuminate\Http\Response
+     */
+    
+    public function ExcelItemReport(Request $request) 
+    {
+        // dd($request);
+        //excel 
+        $data=array();
+        $array_column=array('ID','Invoice ID','Invoice Date','Sold To','Barcode','Product','Price','Quantity','Item Total');
+        array_push($data, $array_column);
+        $inv=$this->SalesItemReport($request);
+        $unit=0;
+        $quantity=0;
+        $total=0;
+        foreach($inv as $voi):
+            $inv_arry=array($voi->id,$voi->invoice_id,$voi->created_at,$voi->customer_name,$voi->product_barcode,$voi->product_name,$voi->price,$voi->quantity,$voi->total_price);
+            array_push($data, $inv_arry);
+            $unit+=$voi->price;
+            $quantity+=$voi->quantity;
+            $total+=$voi->total_price;
+        endforeach;
+
+        $array_column=array('','','','','','Total',$unit,$quantity,$total);
+        array_push($data, $array_column);
+
+        $reportName="Sales Item Report";
+        $report_title="Sales Item Report";
+        $report_description="Report Genarated : ".date('d-M-Y H:i:s a');
+        /*$data = array(
+            array('data1', 'data2'),
+            array('data3', 'data4')
+        );*/
+
+        //array_unshift($data,$array_column);
+
+       // dd($data);
+
+        $excelArray=array(
+            'report_name'=>$reportName,
+            'report_title'=>$report_title,
+            'report_description'=>$report_description,
+            'data'=>$data
+        );
+
+        $this->sdc->ExcelLayout($excelArray);
+        
+    }
+
+
+    public function PdfItemReport(Request $request)
+    {
+
+        $data=array();
+        
+       
+        $reportName="Sales Item Report";
+        $report_title="Sales Item Report";
+        $report_description="Report Genarated : ".date('d-M-Y H:i:s a');
+
+        $html='<table class="table table-bordered" style="width:100%;">
+                <thead>
+                <tr>
+                <th class="text-center" style="font-size:12px;" >ID</th>
+                <th class="text-center" style="font-size:12px;" >Invoice ID</th>
+                <th class="text-center" style="font-size:12px;" >Invoice Date</th>
+                <th class="text-center" style="font-size:12px;" >Sold To</th>
+                <th class="text-center" style="font-size:12px;" >Barcode</th>
+                <th class="text-center" style="font-size:12px;" >Product</th>
+                <th class="text-center" style="font-size:12px;" >Price</th>
+                <th class="text-center" style="font-size:12px;" >Quantity</th>
+                <th class="text-center" style="font-size:12px;" >Total Price</th>
+                </tr>
+                </thead>
+                <tbody>';
+                $unit=0;
+                $quantity=0;
+                $total=0;
+                    $inv=$this->SalesItemReport($request);
+                    foreach($inv as $index=>$voi):
+    
+                        $html .='<tr>
+                        <td>'.$voi->id.'</td>
+                        <td>'.$voi->invoice_id.'</td>
+                        <td>'.$voi->created_at.'</td>
+                        <td>'.$voi->customer_name.'</td>
+                        <td>'.$voi->product_barcode.'</td>
+                        <td>'.$voi->product_name.'</td>
+                        <td>'.$voi->price.'</td>
+                        <td>'.$voi->quantity.'</td>
+                        <td>'.$voi->total_price.'</td>
+                        </tr>';
+
+                        $unit+=$voi->price;
+                        $quantity+=$voi->quantity;
+                        $total+=$voi->total_price;
+
+                    endforeach;
+
+                    $html .='<tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>Total</td>
+                        <td>'.$unit.'</td>
+                        <td>'.$quantity.'</td>
+                        <td>'.$total.'</td>
+                        </tr>';
+
+
+
+                        
+
+             
+                /*html .='<tr style="border-bottom: 5px #000 solid;">
+                <td style="font-size:12px;">Subtotal </td>
+                <td style="font-size:12px;">Total Item : 4</td>
+                <td></td>
+                <td></td>
+                <td style="font-size:12px;" class="text-right">00</td>
+                </tr>';*/
+
+                $html .='</tbody></table>';
+
+                //echo $html; die();
+
+
+
+                $this->sdc->PDFLayout($reportName,$html);
+
+
+    }
+
     public function show(Invoice $invoice,request $request)
     {
         $invoice_id='';
@@ -4903,14 +5245,122 @@ class InvoiceController extends Controller
         return view('apps.pages.sales.make-sales-return',['dataTable'=>$tab]);
     }
 
-    public function makeSalesReturnShow(SalesReturn $SalesReturn)
+    public function makeSalesReturnShow(Request $request)
     {
-        $tab=$SalesReturn::where('store_id',$this->sdc->storeID())
-                         ->orderBy("id","DESC")
-                         ->take(100)
+
+        $invoice_id='';
+        if(isset($request->invoice_id))
+        {
+            $invoice_id=$request->invoice_id;
+        }
+
+        $barcode='';
+        if(isset($request->barcode))
+        {
+            $barcode=$request->barcode;
+        }
+
+        $customer_id='';
+        if(isset($request->customer_id))
+        {
+            $customer_id=$request->customer_id;
+        }
+
+        $start_date='';
+        if(isset($request->start_date))
+        {
+            $start_date=$request->start_date;
+        }
+
+        $end_date='';
+        if(isset($request->end_date))
+        {
+            $end_date=$request->end_date;
+        }
+
+        if(empty($start_date) && !empty($end_date))
+        {
+            $start_date=$end_date;
+        }
+
+        if(!empty($start_date) && empty($end_date))
+        {
+            $end_date=$start_date;
+        }
+
+        $dateString='';
+        if(!empty($start_date) && !empty($end_date))
+        {
+            $dateString="CAST(created_at as date) BETWEEN '".$start_date."' AND '".$end_date."'";
+        }
+
+        if(empty($invoice_id) && empty($customer_id) && empty($start_date) && empty($end_date) && empty($dateString))
+        {
+            $tab=SalesReturn::leftJoin('products','sales_returns.product_id','=','products.id')
+                         ->where('sales_returns.store_id',$this->sdc->storeID())
+                         ->when($invoice_id, function ($query) use ($invoice_id) {
+                                return $query->where('sales_returns.invoice_id','=', $invoice_id);
+                         })
+                         ->when($customer_id, function ($query) use ($customer_id) {
+                                return $query->where('sales_returns.customer_id','=', $customer_id);
+                         })
+                         ->when($barcode, function ($query) use ($barcode) {
+                                return $query->where('products.barcode','=', $barcode);
+                         })
+                         ->when($dateString, function ($query) use ($dateString) {
+                                return $query->whereRaw($dateString);
+                         })
+                         ->select('sales_returns.*','products.barcode')
+                         ->orderBy("sales_returns.id","DESC")
                          ->get();
-        return view('apps.pages.sales.make-sales-return-list',['dataTable'=>$tab]);
+        }
+        else
+        {
+            $tab=SalesReturn::leftJoin('products','sales_returns.product_id','=','products.id')
+                         ->where('sales_returns.store_id',$this->sdc->storeID())
+                         ->when($invoice_id, function ($query) use ($invoice_id) {
+                                return $query->where('sales_returns.invoice_id','=', $invoice_id);
+                         })
+                         ->when($customer_id, function ($query) use ($customer_id) {
+                                return $query->where('sales_returns.customer_id','=', $customer_id);
+                         })
+                         ->when($barcode, function ($query) use ($barcode) {
+                                return $query->where('products.barcode','=', $barcode);
+                         })
+                         ->when($dateString, function ($query) use ($dateString) {
+                                return $query->whereRaw($dateString);
+                         })
+                         ->select('sales_returns.*','products.barcode')
+                         ->orderBy("sales_returns.id","DESC")
+                         ->get();
+        }
+
+        
+
+        $customer=Customer::where('store_id',$this->sdc->storeID())->get();
+
+        return view('apps.pages.sales.make-sales-return-list',[
+            'dataTable'=>$tab,
+            'invoice_id'=>$invoice_id,
+            'customer'=>$customer,
+            'customer_id'=>$customer_id,
+            'start_date'=>$start_date,
+            'end_date'=>$end_date,
+            'barcode'=>$barcode,
+        ]);
     }
+
+
+    // public function makeSalesReturnShow(SalesReturn $SalesReturn)
+    // {
+    //     $tab=$SalesReturn::leftJoin('products','sales_returns.product_id','=','products.id')
+    //                      ->where('sales_returns.store_id',$this->sdc->storeID())
+    //                      ->select('sales_returns.*','products.barcode')
+    //                      ->orderBy("sales_returns.id","DESC")
+    //                      ->take(100)
+    //                      ->get();
+    //     return view('apps.pages.sales.make-sales-return-list',['dataTable'=>$tab]);
+    // }
 
 
     public function createSalesReturn(Invoice $invoice,$sales_id=0)
@@ -5304,5 +5754,356 @@ class InvoiceController extends Controller
                                    ->delete();
         $tab->delete();
         return redirect('sales/report')->with('status', $this->moduleName.' Invoices Deleted Successfully !');
+    }
+
+    public function loadCustomerInvoice(Request $request)
+    {
+        
+        $customer_id=$request->customer_id;
+        $invoice_id=$request->invoice_id;
+        $invoice_date=$request->invoice_date;
+        $barcode=$request->barcode;
+
+        if(!empty($request->barcode))
+        {
+            $loadInvoices=Invoice::join('customers','invoices.customer_id','=','customers.id')
+                             ->join("invoice_products","invoices.invoice_id","=","invoice_products.invoice_id")
+                             ->join("products","invoice_products.product_id","=","products.id")
+                             ->where('invoices.store_id',$this->sdc->storeID())
+                             ->when($invoice_id, function ($query) use ($invoice_id) {
+                                       return $query->where('invoices.invoice_id','=', $invoice_id);
+                             })
+                             ->when($barcode, function ($query) use ($barcode) {
+                                       return $query->where('products.barcode','=', $barcode);
+                             })
+                             ->when($customer_id, function ($query) use ($customer_id) {
+                                       return $query->where('invoices.customer_id','=', $customer_id);
+                             })
+                             ->when($invoice_date, function ($query) use ($invoice_date) {
+                                       return $query->whereDate('invoices.created_at','=', $invoice_date);
+                             })
+                             ->select("invoices.*",'customers.name as customer_name')
+                             ->groupBy('invoices.id')
+                             ->get();
+        }
+        else
+        {
+            $loadInvoices=Invoice::join('customers','invoices.customer_id','=','customers.id')
+                             ->where('invoices.store_id',$this->sdc->storeID())
+                             ->when($invoice_id, function ($query) use ($invoice_id) {
+                                       return $query->where('invoices.invoice_id','=', $invoice_id);
+                             })
+                             ->when($customer_id, function ($query) use ($customer_id) {
+                                       return $query->where('invoices.customer_id','=', $customer_id);
+                             })
+                             ->when($invoice_date, function ($query) use ($invoice_date) {
+                                       return $query->whereDate('invoices.created_at','=', $invoice_date);
+                             })
+                             ->select("invoices.*",'customers.name as customer_name')
+                             ->get();
+        }
+
+        
+
+        return response()->json($loadInvoices);
+    }
+
+    public function loadCustomerReturnInvoice(Request $request){
+        //dd($request->invoice_id);
+        $sql_invoice = InvoiceProduct::where('invoice_id',$request->invoice_id)
+                                     ->leftJoin('products','invoice_products.product_id','=','products.id')
+                                     ->select('invoice_products.*','products.name as product_name','products.barcode as product_barcode')
+                                     ->get();
+
+        $table_data = [];
+        if(count($sql_invoice)>0){
+            foreach ($sql_invoice as $key => $row) {
+                 //-$row->return_item
+                 $tdrows=json_decode(json_encode($row)); 
+                 //dd(json_decode(json_encode($row)));
+                 for($i=1; $i<=$row->quantity; $i++) {
+                    $tdrow=[]; 
+
+                    foreach($tdrows as $index=>$td){
+                        $tdrow[$index]=$td;
+                     }
+
+                     if($i<=$row->return_item)
+                     {
+                        $tdrow['item_return_status']="1";
+                     }
+                     else
+                     {
+                        $tdrow['item_return_status']="0";
+                     }
+
+                     $table_data[]=$tdrow; 
+                 }
+                //$table_data[]=$row;
+            }
+        }                             
+        return response()->json($table_data);
+    }
+
+    public function saveCustomerReturnItem(Request $request){
+        //dd($request);
+        $product = InvoiceProduct::where('invoice_products.id',$request->item_id)
+                                     ->leftJoin('products','invoice_products.product_id','=','products.id')
+                                     ->leftJoin('invoices','invoice_products.invoice_id','=','invoices.invoice_id')
+                                     ->select('invoice_products.*','invoices.customer_id','products.name as product_name','products.barcode as product_barcode')
+                                     ->first();
+
+        $product_quantity = $product->quantity;
+        $product_return_item = $product->return_item;
+
+        if($product_quantity == $product_return_item){
+            return response()->json(array('status'=>1,'data'=>[]));
+        }
+        else
+        {
+            $product->return_item=$product->return_item + 1;
+            $product->save();
+
+            Product::find($product->product_id)->increment('quantity',1);
+        }
+
+        //dd($product);
+
+        $invoice=Invoice::where('invoice_id',$product->invoice_id)->first();
+        $customer=Customer::find($product->customer_id);
+        $sr=new SalesReturn;
+        $sr->invoice_id=$product->invoice_id;
+        $sr->customer_id=$product->customer_id;
+        $sr->customer_name=$customer->name;
+        $sr->product_id=$product->product_id;
+        $sr->product_name=$product->product_name;
+        $sr->invoice_total=$invoice->total_amount;
+        $sr->sales_return_amount=$request->return_amount;
+        $sr->sales_return_note=$request->return_reason;
+        $sr->store_id=$this->sdc->storeID();
+        $sr->created_by=$this->sdc->UserID();
+        $sr->save();
+
+        return response()->json(array('status'=>1,'data'=>$sr));
+    }
+
+    public function SaveSalesReturnInvoice(Request $request)
+    {
+
+
+        $tab=Invoice::where('invoice_id',$request->invoice_id)->first();
+        $tab->sales_return=1;
+        $tab->save();
+
+        $customer=Customer::find($request->customer_id);
+
+        $sr=new SalesReturn;
+        $sr->invoice_id=$request->invoice_id;
+        $sr->customer_id=$request->customer_id;
+        $sr->customer_name=$customer->name;
+        $sr->invoice_total=$request->sales_amount;
+        $sr->sales_return_amount=$request->return_amount;
+        $sr->sales_return_note=$request->sales_return_note;
+        $sr->store_id=$this->sdc->storeID();
+        $sr->created_by=$this->sdc->UserID();
+        $sr->save();
+
+        return response()->json(1); 
+    }
+
+    public function makeSalesReturnShowQuery($request)
+    {
+        $invoice_id='';
+        if(isset($request->invoice_id))
+        {
+            $invoice_id=$request->invoice_id;
+        }
+
+        $customer_id='';
+        if(isset($request->customer_id))
+        {
+            $customer_id=$request->customer_id;
+        }
+
+        $barcode='';
+        if(isset($request->barcode))
+        {
+            $barcode=$request->barcode;
+        }
+
+        $start_date='';
+        if(isset($request->start_date))
+        {
+            $start_date=$request->start_date;
+        }
+
+        $end_date='';
+        if(isset($request->end_date))
+        {
+            $end_date=$request->end_date;
+        }
+
+        if(empty($start_date) && !empty($end_date))
+        {
+            $start_date=$end_date;
+        }
+
+        if(!empty($start_date) && empty($end_date))
+        {
+            $end_date=$start_date;
+        }
+
+        $dateString='';
+        if(!empty($start_date) && !empty($end_date))
+        {
+            $dateString="CAST(sales_returns.created_at as date) BETWEEN '".$start_date."' AND '".$end_date."'";
+        }
+
+        $invoice=SalesReturn::leftJoin('products','sales_returns.product_id','=','products.id')
+                         ->where('sales_returns.store_id',$this->sdc->storeID())
+                         ->when($invoice_id, function ($query) use ($invoice_id) {
+                                return $query->where('sales_returns.invoice_id','=', $invoice_id);
+                         })
+                         ->when($customer_id, function ($query) use ($customer_id) {
+                                return $query->where('sales_returns.customer_id','=', $customer_id);
+                         })
+                         ->when($barcode, function ($query) use ($barcode) {
+                                return $query->where('products.barcode','=', $barcode);
+                         })
+                         ->when($dateString, function ($query) use ($dateString) {
+                                return $query->whereRaw($dateString);
+                         })
+                         ->select('sales_returns.*','products.barcode')
+                         ->orderBy("id","DESC")
+                         ->get();
+        //dd($invoice);
+        return $invoice;
+    }
+
+    public function exportExcelmakeSalesReturnShow(Request $request) 
+    {
+        //excel 
+        $total_amount=0;
+        $total_sales_amount=0;
+        $total_re_amount=0;
+
+        $data=array();
+        $array_column=array('Invoice ID','Sales Return Date','Return To','Barcode','Product Returned','Sales Total','Return Amount','Return Note');
+        array_push($data, $array_column);
+        $inv=$this->makeSalesReturnShowQuery($request);
+        $total=0;
+        foreach($inv as $voi):
+            $inv_arry=array($voi->invoice_id,$voi->created_at,$voi->customer_name,$voi->barcode,$voi->product_name,$voi->invoice_total,$voi->sales_return_amount,$voi->sales_return_note);
+
+            $total_amount+=$voi->invoice_total;
+            $total_sales_amount+=$voi->sales_return_amount;
+            $total_re_amount+=$voi->sales_return_amount;
+            array_push($data, $inv_arry);
+            $total+=$voi->sales_return_amount;
+        endforeach;
+
+        $array_column=array('','','','','','Total',$total,'');
+        array_push($data, $array_column);
+
+        $reportName="Sales Return Report";
+        $report_title="Sales Return Report";
+        $report_description="Report Genarated : ".date('d-M-Y H:i:s a');
+        /*$data = array(
+            array('data1', 'data2'),
+            array('data3', 'data4')
+        );*/
+
+        //array_unshift($data,$array_column);
+
+       // dd($data);
+
+        $excelArray=array(
+            'report_name'=>$reportName,
+            'report_title'=>$report_title,
+            'report_description'=>$report_description,
+            'data'=>$data
+        );
+        // dd($excelArray);
+        $this->sdc->ExcelLayout($excelArray);
+        
+    }
+
+    public function exportPDFmakeSalesReturnShow(Request $request)
+    {
+
+        $data=array();
+        
+       
+        $reportName="Sales Return Report";
+        $report_title="Sales Return Report";
+        $report_description="Report Genarated : ".date('d-M-Y H:i:s a');
+
+        $html='<table class="table table-bordered" style="width:100%;">
+                <thead>
+                <tr>
+                <th class="text-center" style="font-size:12px;" >Invoice ID</th>
+                <th class="text-center" style="font-size:12px;" >Sales Return Date</th>
+                <th class="text-center" style="font-size:12px;" >Return To</th>
+                <th class="text-center" style="font-size:12px;" >Barcode</th>
+                <th class="text-center" style="font-size:12px;" >Product Return</th>
+                <th class="text-center" style="font-size:12px;" >Sales Total</th>
+                <th class="text-center" style="font-size:12px;" >Return Amount</th>
+                <th class="text-center" style="font-size:12px;" >Return Note</th>
+                </tr>
+                </thead>
+                <tbody>';
+
+                    //$inv_arry=array($voi->invoice_id,$voi->created_at,$voi->customer_name,$voi->invoice_total,$voi->sales_return_amount,$voi->sales_return_note);
+                    $inv=$this->makeSalesReturnShowQuery($request);
+                    $total=0;
+                    foreach($inv as $voi):
+                        $html .='<tr>
+                        <td style="font-size:12px;" class="text-center">'.$voi->invoice_id.'</td>
+                        <td style="font-size:12px;" class="text-center">'.$voi->created_at.'</td>
+                        <td style="font-size:12px;" class="text-center">'.$voi->customer_name.'</td>
+                        <td style="font-size:12px;" class="text-center">'.$voi->barcode.'</td>
+                        <td style="font-size:12px;" class="text-center">'.$voi->product_name.'</td>
+                        <td style="font-size:12px;" class="text-right">'.$voi->invoice_total.'</td>
+                        <td style="font-size:12px;" class="text-right">'.$voi->sales_return_amount.'</td>
+                        <td style="font-size:12px;" class="text-right">'.$voi->sales_return_note.'</td>
+                        </tr>';
+                        $total+=$voi->sales_return_amount;
+                    endforeach;
+
+                    $html .='<tr>
+                        <td style="font-size:12px;" class="text-center"></td>
+                        <td style="font-size:12px;" class="text-center"></td>
+                        <td style="font-size:12px;" class="text-center"></td>
+                        <td style="font-size:12px;" class="text-center"></td>
+                        <td style="font-size:12px;" class="text-center"></td>
+                        <td style="font-size:12px;" class="text-right">Total</td>
+                        <td style="font-size:12px;" class="text-right">'.$total.'</td>
+                        <td style="font-size:12px;" class="text-right"></td>
+                        </tr>';
+
+
+                        
+
+             
+                /*html .='<tr style="border-bottom: 5px #000 solid;">
+                <td style="font-size:12px;">Subtotal </td>
+                <td style="font-size:12px;">Total Item : 4</td>
+                <td></td>
+                <td></td>
+                <td style="font-size:12px;" class="text-right">00</td>
+                </tr>';*/
+
+                $html .='</tbody>
+                
+                </table>
+
+
+                ';
+
+
+
+                $this->sdc->PDFLayout($reportName,$html);
+
+
     }
 }

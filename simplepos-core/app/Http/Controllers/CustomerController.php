@@ -12,6 +12,9 @@ use Illuminate\Http\Request;
 use App\Invoice;
 use Excel;
 use Auth;
+use App\Rules\MatchOldPassword;
+use Illuminate\Support\Facades\Hash;
+
 class CustomerController extends Controller
 {
     /**
@@ -25,6 +28,46 @@ class CustomerController extends Controller
     private $moduleName="Customer";
     private $sdc;
     public function __construct(){ $this->sdc = new StaticDataController(); }
+
+    public function UserInfoShow(Request $request)
+    {
+        $id=$this->sdc->UserID();
+        $edit = User::leftJoin('roles','users.user_type','=','roles.id')
+                    ->leftJoin('stores','users.store_id','=','stores.store_id')
+                    ->where('users.id',$id)
+                    ->select('users.*','roles.name as role_name','stores.name as store_name')
+                    ->first();
+        return view('apps.pages.user_info.user_info',['edit'=>$edit]);        
+    }
+
+
+    public function change_password(Request $request)
+    {
+        return view('apps.pages.user_info.change_password');        
+    }
+
+    public function do_change_password(Request $request)
+    {
+
+        $this->validate($request, [
+            'current_password'=>'required',
+            'new_password'=>'required_with:retype_password|same:retype_password',
+            'retype_password'=>'required',
+        ]);
+        $id=$this->sdc->UserID();
+        $user_data=User::find($id);
+        if(Hash::check($request->current_password,$user_data->password))
+        {
+            $this->sdc->log("User","User [".$user_data->name."] changed account password.");
+            User::find($id)->update(['password'=> Hash::make($request->new_password)]);
+            return redirect(url('change-password'))->with('status','Password Changed Successfully.');
+        }
+        else
+        {
+            $this->sdc->log("User","User [".$user_data->name."] failed to change account password.");
+            return redirect(url('change-password'))->with('error','Current Password Mismatch.');
+        }
+    }
 
     public function user()
     {

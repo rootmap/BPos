@@ -41,9 +41,10 @@
 
     </style>
 
+
     <form  enctype="multipart/form-data" action="{{url('pos-settings/invoice/save/'.$id)}}" method="POST">
         {{csrf_field()}}
-        <input type="hidden" name="id" value="{{$id}}">
+        <input type="hidden" name="id" value="{{$id}}" />
 	<div class="row">
         <div class="col-lg-3">
             <div class="col-md-12" style="border-bottom: 5px #000 solid; font-size: 25px; font-weight: bold; padding-left: 0px;">
@@ -298,18 +299,12 @@
 
                 <div class="col-md-3 text-xs-center">
                     <span>{{$edit->c_four}}</span>
-                    <input size="25" type="text" class="text_changer" value="{{$edit->c_four}}" name="c_four" style="display: none;">
-                    <a href="javascript:void(0);" class="text_changer_field"><i class="icon-edit2"></i></a>
                 </div>
                 <div class="col-md-5 text-xs-center">
                     <span>{{$edit->c_five}}</span>
-                    <input size="25" type="text" class="text_changer" value="{{$edit->c_five}}" name="c_five" style="display: none;">
-                    <a href="javascript:void(0);" class="text_changer_field"><i class="icon-edit2"></i></a>
                 </div>
                 <div class="col-md-4 text-xs-center">
                     <span>{{$edit->c_six}}</span>
-                    <input size="25" type="text" class="text_changer" value="{{$edit->c_six}}" name="c_six" style="display: none;">
-                    <a href="javascript:void(0);" class="text_changer_field"><i class="icon-edit2"></i></a>
                 </div>
             </div>
             <div class="col-md-12" style="border-bottom: 5px #000 solid; clear: both; margin-top: 15px;">

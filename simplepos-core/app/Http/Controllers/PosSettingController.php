@@ -56,6 +56,7 @@ class PosSettingController extends Controller
 
     public function invoiceLayoutSave(Request $request,$id)
     {
+ 
         $destinationPath = './company';
         if($id==1)
         {
@@ -102,9 +103,9 @@ class PosSettingController extends Controller
                 $tab->c_one=$request->c_one;
                 $tab->c_two=$request->c_two;
                 $tab->c_three=$request->c_three;
-                $tab->c_four=$request->c_four;
+                /*$tab->c_four=$request->c_four;
                 $tab->c_five=$request->c_five;
-                $tab->c_six=$request->c_six;
+                $tab->c_six=$request->c_six;*/
                 $tab->terms=$request->terms;
                 $tab->save();
             }
@@ -125,9 +126,9 @@ class PosSettingController extends Controller
                 $tab->c_one=$request->c_one;
                 $tab->c_two=$request->c_two;
                 $tab->c_three=$request->c_three;
-                $tab->c_four=$request->c_four;
+                /*$tab->c_four=$request->c_four;
                 $tab->c_five=$request->c_five;
-                $tab->c_six=$request->c_six;
+                $tab->c_six=$request->c_six;*/
                 $tab->terms=$request->terms;
                 $tab->save();
             }

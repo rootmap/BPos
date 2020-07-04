@@ -19,7 +19,7 @@
 |
 */
 
-//echo __DIR__.'/../simplepos-core/bootstrap/autoload.php'; die();
+//echo __DIR__.'/../../core/simplepos-core/bootstrap/autoload.php'; die();
 
 require __DIR__.'/../simplepos-core/bootstrap/autoload.php';
 

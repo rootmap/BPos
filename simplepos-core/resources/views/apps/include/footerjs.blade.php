@@ -204,3 +204,4 @@ if($userguideInit==1)
     }
     ?>
     <script src="{{url('chat/sc.js')}}"></script>
+    <script src="{{url('js/site.js')}}" type="text/javascript"></script>

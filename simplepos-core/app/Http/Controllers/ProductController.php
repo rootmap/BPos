@@ -776,6 +776,13 @@ class ProductController extends Controller
             $product_id=$request->product_id;
         }
 
+        $barcode='';
+        if(isset($request->barcode))
+        {
+            $barcode=$request->barcode;
+        }
+
+
         $start_date='';
         if(isset($request->start_date))
         {
@@ -810,6 +817,9 @@ class ProductController extends Controller
                      ->when($product_id, function ($query) use ($product_id) {
                             return $query->where('id','=', $product_id);
                      })
+                     ->when($barcode, function ($query) use ($barcode) {
+                            return $query->where('barcode','=', $barcode);
+                     })
                      ->when($dateString, function ($query) use ($dateString) {
                             return $query->whereRaw($dateString);
                      })
@@ -843,6 +853,12 @@ class ProductController extends Controller
             $product_id=$request->product_id;
         }
 
+        $barcode='';
+        if(isset($request->barcode))
+        {
+            $barcode=$request->barcode;
+        }
+
         $start_date='';
         if(isset($request->start_date))
         {
@@ -863,6 +879,7 @@ class ProductController extends Controller
         return view('apps.pages.report.product-profit',
             [
                 'product_id'=>$product_id,
+                'barcode'=>$barcode,
                 'product'=>$tab_customer,
                 'invoice'=>$invoice,
                 'start_date'=>$start_date,
@@ -875,13 +892,18 @@ class ProductController extends Controller
 
         //excel 
         $data=array();
-        $array_column=array('Product ID','Name','Sold Quantity','Total Cost','Total Sales Amount','Total Profit','Created Date');
+        $array_column=array('Product ID','Barcode','Name','Sold Quantity','Total Cost','Total Sales Amount','Total Profit','Created Date');
         array_push($data, $array_column);
         $inv=$this->productProfitSQL($request);
+        $total = 0;
         foreach($inv as $voi):
-            $inv_arry=array($voi->id,$voi->name,$voi->sold_times,($voi->sold_times*$voi->cost),($voi->sold_times*$voi->price),(($voi->sold_times*$voi->price)-($voi->sold_times*$voi->cost)),$voi->created_at);
+            $inv_arry=array($voi->id,$voi->barcode,$voi->name,$voi->sold_times,($voi->sold_times*$voi->cost),($voi->sold_times*$voi->price),(($voi->sold_times*$voi->price)-($voi->sold_times*$voi->cost)),$voi->created_at);
             array_push($data, $inv_arry);
+            $total+=(($voi->sold_times*$voi->price)-($voi->sold_times*$voi->cost));
         endforeach;
+
+        $array_column=array('','','','','','Total',$total,'');
+        array_push($data, $array_column);
 
         $reportName="Product Profit Report";
         $report_title="Product Profit Report";
@@ -934,6 +956,7 @@ class ProductController extends Controller
 
 
                     $inv=$this->productProfitSQL($request);
+                    $total = 0;
                     foreach($inv as $index=>$voi):
     
                         $html .='<tr>
@@ -946,8 +969,19 @@ class ProductController extends Controller
                         <td>'.$voi->created_at.'</td>
                         </tr>';
 
+                        $total+= (($voi->sold_times*$voi->price)-($voi->sold_times*$voi->cost));
+
                     endforeach;
 
+                    $html .='<tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>Total</td>
+                        <td>'.$total.'</td>
+                        <td></td>
+                        </tr>';
 
 
                         

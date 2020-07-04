@@ -28,7 +28,7 @@
 							{{csrf_field()}}
 							<fieldset class="form-group">
 	                            <div class="row">
-	                                <div class="col-md-3">
+	                                <div class="col-md-2">
 	                                    <h4>Start Date</h4>
 	                                    <div class="input-group">
 	                                        <span class="input-group-addon"><i class="icon-calendar3"></i></span>
@@ -39,7 +39,7 @@
 	                                        name="start_date" type="text" class="form-control DropDateWithformat" />
 	                                    </div>
 	                                </div>
-	                                <div class="col-md-3">
+	                                <div class="col-md-2">
 	                                    <h4>End Date</h4>
 	                                    <div class="input-group">
 	                                        <span class="input-group-addon"><i class="icon-calendar3"></i></span>
@@ -48,6 +48,16 @@
 	                                        	value="{{$end_date}}"  
 	                                        @endif 
 	                                         name="end_date" type="text" class="form-control DropDateWithformat" />
+	                                    </div>
+									</div>
+									<div class="col-md-2">
+	                                    <h4>Barcode</h4>
+	                                    <div class="input-group">
+										<input 
+										 @if(!empty($barcode))
+	                                        	value="{{$barcode}}"  
+	                                     @endif 
+										 type="text" id="eventRegInput1" class="form-control border-primary" placeholder="Barcode" name="barcode">
 	                                    </div>
 	                                </div>
 	                                <div class="col-md-2">

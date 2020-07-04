@@ -97,7 +97,7 @@ class StaticDataController extends Facade {
 
     public static function urlForChangeData()
     {
-        return "http://localhost/bpos/pos/";
+        return "http://pos.bhuyianhost.com/";
     }
 
     public static function userguideInit() 
@@ -112,7 +112,6 @@ class StaticDataController extends Facade {
                         ->where('page_name',$fullURL)
                         ->where('user_tour_status',2)
                         ->count();
-
         $matchRouteLink=0;
         $skipArray=array('purchase');
         if(count($skipArray)>0)
@@ -149,7 +148,7 @@ class StaticDataController extends Facade {
             $stReturn = 2;
         }
         
-        
+        $stReturn = 2;
 
 
         return $stReturn;

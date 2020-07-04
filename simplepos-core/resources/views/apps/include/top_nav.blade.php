@@ -110,7 +110,7 @@ if(!empty($objSite))
 
 
 <nav class="header-navbar navbar navbar-with-menu {{$navClass}} navbar-dark navbar-shadow" style="height: 4.1rem !important;">
-      <div class="navbar-wrapper" style="height: 4.1rem !important; overflow: hidden;">
+      <div class="navbar-wrapper">
         <div class="navbar-header">
           <ul class="nav navbar-nav">
             <li  id="tour-2" class="nav-item navbar-minimize">
@@ -125,84 +125,84 @@ if(!empty($objSite))
 
         <div class="navbar-container content container-fluid">
           <div id="navbar-mobile" class="collapse navbar-toggleable-sm">
+
           
-            <ul class="nav navbar-nav float-xs-right">
-                @if(Request::path() != 'pos')
-                <style type="text/css">
-          blink {
-                  -webkit-animation: 2s linear infinite condemned_blink_effect; // for Safari 4.0 - 8.0
-                  animation: 2s linear infinite condemned_blink_effect;
-                }
-                @-webkit-keyframes condemned_blink_effect { // for Safari 4.0 - 8.0
-                  0% {
-                    visibility: hidden;
-                  }
-                  50% {
-                    visibility: hidden;
-                  }
-                  100% {
-                    visibility: visible;
-                  }
-                }
-                @keyframes condemned_blink_effect {
-                  0% {
-                    visibility: hidden;
-                  }
-                  50% {
-                    visibility: hidden;
-                  }
-                  100% {
-                    visibility: visible;
-                  }
-                }
-                        </style>
-                <li class="dropdown dropdown-user nav-item border-left-grey border-lighten-2">
-                      <a href="{{url('pos')}}"   title="Click here to create new sales." class="nav-link dropdown-user-link">
-                      <span class="user-name"  style="line-height: 29px; text-decoration: blink; font-size: 15px; font-weight: 700;">
-                        <i class="icon-shopping-cart"></i>  Click here to create new <blink>sales</blink> </span>
-                      </a>
-                </li>
-                @endif
-
-                <li class="dropdown dropdown-user nav-item  border-left-grey  border-right-grey border-lighten-2" title="Full Screen View" data-toggle="tooltip" data-placement="top" data-title="Fullscreen" style="padding-left:8px;">
-                  <a id="fullscreen" title="" style="font-size: 20px" href="javascript:void(0);" data-toggle="tooltip" data-placement="top" data-title="Fullscreen" data-original-title="Fullscreen View" class="nav-link" style=" padding-top: 20px;">
-                      <i style="font-size: 25px;  color:#fff;" class="icon-desktop"></i>
+            <ul class="nav navbar-nav float-xs-left"> 
+              <li class="nav-item"><a href="#" class="nav-link"  id="fullscreen" data-title="Fullscreen" data-original-title="Fullscreen View"><i style="  color:#fff;" class="ficon icon-desktop"></i></a></li>
+            </ul>
+            <ul class="nav navbar-nav float-xs-right"> 
+                
+              <li class="dropdown dropdown-user nav-item">
+                <a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown">
+                    <i class="icon-link3"></i>
+                    <span data-i18n="nav.templates.main"> Quick Links </span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                  <a href="{{url('pos')}}" class="dropdown-item">
+                    <i class="fa fa-shopping-basket"></i> Cash Register | POS
                   </a>
-                </li>
-
-                <li class="dropdown dropdown-user nav-item border-right-grey border-lighten-2">
-                    <a href="#" data-toggle="dropdown" title="Profile" class="nav-link dropdown-user-link">
-                    <span class="avatar avatar-online">
-                        <img src="{{url('theme/app-assets/images/portrait/small/avatar-s-1.png')}}" alt="avatar">
-                        <i></i>
-                    </span>
-                    <span class="user-name">{{Auth::user()->name}}</span>
-                    </a>
+                  <a href="{{url('sales/return/create')}}" class="dropdown-item">
+                    <i class="icon-cart32"></i> Sales Return
+                  </a>
+                  <a href="{{url('category')}}" class="dropdown-item">
+                    <i class="icon-ios-toggle-outline"></i> New Product Category
+                  </a>
+                  <a href="{{url('product')}}" class="dropdown-item">
+                    <i class="icon-levels"></i> New Product
+                  </a>
+                </div>
               </li>
-{{-- 
-              <a href="#" class="nav-link dropdown-user-link">
-                <span class="user-name" style="line-height: 40px; font-size: 25px; margin-left: 15px;"> <i class="icon-unlock-alt danger"></i></span></a> --}}
-              <li class="dropdown-user nav-item">
+                
+              <li class="dropdown dropdown-user nav-item">
+                <a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown">
+                    <i class="icon-bar-chart"></i>
+                    <span data-i18n="nav.templates.main"> Quick Reports </span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                  <a  href="{{url('sales/report')}}" target="_blank" class="dropdown-item">
+                    <i class="icon-android-list"></i> Sales Report
+                  </a>
+                  <a href="{{url('payment/report')}}" target="_blank" class="dropdown-item">
+                    <i class="icon-cash"></i> Payment Report
+                  </a>
+                  <a href="{{url('profit/report')}}" target="_blank" class="dropdown-item">
+                    <i class="icon-money1"></i> Profit Report
+                  </a>
+                  <a href="{{url('sales/return/list')}}" target="_blank" class="dropdown-item">
+                    <i class="icon-money1"></i> Sales Return Report
+                  </a>
+                </div>
+              </li>
+              
 
-                <a href="javascript:void(0);" onclick="logoutFRM();" data-toggle="dropdown" title="Profile" class="nav-link dropdown-user-link">
-                    <span class="">
-                        <i style="
-    line-height: 31px;
-    font-size: 22px;
-    margin-left: 18px;
-" class="icon-power3"></i>
-                    </span>
-                    </a>
-                <div class="dropdown-menu dropdown-menu-right" style="z-index: 9999 !important;">
-                  <!-- <a href="#" class="dropdown-item"><i class="icon-head"></i> Edit Profile</a>
-                  <a href="#" class="dropdown-item"><i class="icon-mail6"></i> My Inbox</a>
-                  <a href="#" class="dropdown-item"><i class="icon-clipboard2"></i> Task</a>
-                  <a href="#" class="dropdown-item"><i class="icon-calendar5"></i> Calender</a> -->
+              <li class="dropdown dropdown-user nav-item">
+                <a href="#" data-toggle="dropdown" class="dropdown-toggle nav-link dropdown-user-link">
+                  <span class="avatar avatar-online">
+                    <img src="{{url('theme/app-assets/images/portrait/small/avatar-s-1.png')}}" alt="{{Auth::user()->name}}">
+                    <i></i>
+                  </span>
+                  <span class="user-name">{{Auth::user()->name}}</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                  <a href="{{url('store-info')}}" class="dropdown-item">
+                    <i class="icon-home"></i> Store Info
+                  </a>
+                  <a href="{{url('user-info')}}" class="dropdown-item">
+                    <i class="icon-user-check"></i> Profile
+                  </a>
+                  <a href="{{url('change-password')}}" class="dropdown-item">
+                    <i class="icon-key22"></i> Change Password
+                  </a>
+                  <a href="{{url('event/calendar')}}" target="_blank" class="dropdown-item">
+                    <i class="icon-calendar5"></i> View Calender
+                  </a>
                   <div class="dropdown-divider"></div>
-                  <form method="post" id="logoutME" action="{{url('logout')}}" >
-                      <input type="hidden" name="_token" value="{{csrf_token()}}">
-                      <button class="link-login btn dropdown-item" href="{{url('logout')}}" title="logout" rel="nofollow"><i class="icon-power3"></i> Logout</button>
-                  </form>
+                  <a  href="javascript:void(0);" onclick="logoutFRM();" class="dropdown-item">
+                    <i class="icon-power3"></i> Logout 
+                    <form method="post" id="logoutME" action="{{url('logout')}}" >
+                        <input type="hidden" name="_token" value="{{csrf_token()}}">
+                    </form>
+                  </a>
                 </div>
               </li>
             </ul>

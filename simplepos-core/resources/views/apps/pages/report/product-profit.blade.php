@@ -46,6 +46,16 @@
 	                                        @endif 
 	                                         name="end_date" type="text" class="form-control DropDateWithformat" />
 	                                    </div>
+									</div>
+									<div class="col-md-2">
+	                                    <h4>Barcode</h4>
+	                                    <div class="input-group">
+										<input 
+										 @if(!empty($barcode))
+	                                        	value="{{$barcode}}"  
+	                                     @endif 
+										 type="text" id="eventRegInput1" class="form-control border-primary" placeholder="Barcode" name="barcode">
+	                                    </div>
 	                                </div>
 	                                <div class="col-md-3">
 	                                    <h4>Product</h4>
@@ -58,7 +68,7 @@
 													 @if(!empty($product_id) && $product_id==$cus->id)
 				                                        selected="selected"  
 				                                     @endif 
-													value="{{$cus->id}}">{{$cus->name}}</option>
+													value="{{$cus->id}}">{{$cus->barcode}}-{{$cus->name}}</option>
 													@endforeach
 												@endif
 											</select>
@@ -157,6 +167,7 @@
 						<thead>
 							<tr>
 								<th>ID</th>
+								<th>Barcode</th>
 								<th>Name</th>
 								<th>Sold Quantity</th>
 								<th>Total Cost</th>
@@ -170,6 +181,7 @@
 								@foreach($invoice as $inv)
 								<tr>
 	                                <td>{{$inv->id}}</td>
+	                                <td>{{$inv->barcode}}</td>
 	                                <td>{{$inv->name}}</td>
 	                                <td>{{$inv->sold_times}}</td>
 	                                <td>{{($inv->sold_times*$inv->cost)}}</td>

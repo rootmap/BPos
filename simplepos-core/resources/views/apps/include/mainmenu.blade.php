@@ -248,6 +248,9 @@
                     @if(in_array('sales/report', $dataMenuAssigned))
                     <li class="{{ Request::path() == 'sales/report' ? 'active' : '' }}  border-bottom-purple"><a href="{{url('sales/report')}}" class="menu-item">Sales Report</a></li>
                     @endif 
+                    @if(in_array('sales-item/report', $dataMenuAssigned))
+                    <li class="{{ Request::path() == 'sales-item/report' ? 'active' : '' }}  border-bottom-purple"><a href="{{url('sales-item/report')}}" class="menu-item">Sales Item Report</a></li>
+                    @endif 
 
                     @if(in_array('attendance/punch/report', $dataMenuAssigned))
                     <li class="{{ Request::path() == 'attendance/punch/report' ? 'active' : '' }}  border-bottom-purple"><a href="{{url('attendance/punch/report')}}" class="menu-item">Attendance Punch Report</a></li>

@@ -7,6 +7,7 @@
   <meta name="description" content="Simple-pos">
   <meta name="keywords" content="POS,Simple-pos">
   <meta name="pos-token" content="{{ csrf_token() }}">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="author" content="Md Mahamudur Zaman Bhuyian-Fahad">
   <title>
     @yield('title')

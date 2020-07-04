@@ -140,7 +140,12 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('/user/modify/{id}', 'CustomerController@userUpdate');
 	Route::get('/user/delete/{id}', 'CustomerController@Userdestroy');
 
+	Route::get('user-info', 'CustomerController@UserInfoShow');
+	Route::get('change-password', 'CustomerController@change_password');
+	Route::post('change-password', 'CustomerController@do_change_password');
+
 	//store controller
+	Route::get('store-info', 'StoreController@storeInfo');
 	Route::get('store-shop', 'StoreController@create');
 	Route::get('store-shop/list', 'StoreController@index');
 	Route::post('store-shop/save', 'StoreController@store');
@@ -319,7 +324,7 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/invoice/counter-pos/pay/paypal', 'InvoiceController@posCounterPayPaypal');
 	Route::get('/pos/payment/paypal/{invoice_id}/{status}', 'InvoiceController@getPOSPaymentStatusPaypal');
 	Route::get('/counter-pos/payment/paypal/{invoice_id}/{status}', 'InvoiceController@getCounterPOSPaymentStatusPaypal');
-	Route::get('/sales/report', 'InvoiceController@show');
+	
 	Route::get('/sales/invoice/{invoice_id}', 'InvoiceController@invoiceShow');
 	Route::get('/sales/invoice/print/pdf/{invoice_id}', 'InvoiceController@invoicePDF');
 	Route::get('/sales/invoice/print/media/pdf/{ptype}/{invoice_id}', 'InvoiceController@invoicePDFByMedia');
@@ -349,16 +354,30 @@ Route::group(['middleware' => 'auth'], function () {
 	// Route::get('/sales/excel/report', 'InvoiceController@exportExcel');
 	// Route::get('/sales/pdf/report', 'InvoiceController@salesPDF');
 
+	Route::get('/sales/report', 'InvoiceController@show');
 	Route::post('/sales/report', 'InvoiceController@show');
 	Route::post('/sales/excel/report', 'InvoiceController@ExcelReport');
 	Route::post('/sales/pdf/report', 'InvoiceController@PdfReport');
+
+	Route::get('/sales-item/report', 'InvoiceController@showitem');
+	Route::post('/sales-item/report', 'InvoiceController@showitem');
+	Route::post('/sales-item/excel/report', 'InvoiceController@ExcelItemReport');
+	Route::post('/sales-item/pdf/report', 'InvoiceController@PdfItemReport');
 	//------------------Sales route end--------------------//
 
 	//------------------Sales Return Route Start--------------//
 	Route::get('/sales/return/create', 'InvoiceController@makeSalesReturn');
 	Route::get('/sales/return/list', 'InvoiceController@makeSalesReturnShow');
+	Route::post('/sales/return/list', 'InvoiceController@makeSalesReturnShow');
 	Route::get('/sales/return/make/{sales_id}', 'InvoiceController@createSalesReturn');
 	Route::post('/sales/return/make/{sales_id}', 'InvoiceController@storeSalesReturn');
+
+	Route::post('/sales/return/invoice/ajax', 'InvoiceController@loadCustomerInvoice');
+	Route::post('/sales/return/invoice/detail', 'InvoiceController@loadCustomerReturnInvoice');
+	Route::post('/sales/return/item', 'InvoiceController@saveCustomerReturnItem');
+	Route::post('/sales/return/save/ajax', 'InvoiceController@SaveSalesReturnInvoice');
+	Route::post('/sales/return/list/excel/report', 'InvoiceController@exportExcelmakeSalesReturnShow');
+	Route::post('/sales/return/list/pdf/report', 'InvoiceController@exportPDFmakeSalesReturnShow');
 	//------------------Sales Return Route End--------------//
 
 	//------------------Event Calender Route Start--------------//
@@ -477,7 +496,8 @@ Route::group(['middleware' => 'auth'], function () {
 	
 	Route::get('pos/settings', 'PosSettingController@index');
 	Route::get('pos/settings/invoice/{id}', 'PosSettingController@invoiceLayout');
-	Route::post('pos-settings/invoice/save/{id}', 'PosSettingController@invoiceLayoutSave');
+	Route::post('/layoutone/', 'VendorController@index');
+	Route::post('pos-settings/invoice/save/{id}','PosSettingController@invoiceLayoutSave'); //
 	Route::post('pos/settings/save', 'PosSettingController@store');
 	Route::post('pos/settings/update/{id}', 'PosSettingController@update');
 
